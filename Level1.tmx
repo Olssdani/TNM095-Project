@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#9b9bc8" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" name="My Tiles" tilewidth="128" tileheight="128" tilecount="7" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="128" height="128" source="ground03.png"/>
+  </tile>
+  <tile id="1">
+   <image width="128" height="128" source="ground04.png"/>
+  </tile>
+  <tile id="2">
+   <image width="128" height="128" source="ground05.png"/>
+  </tile>
+  <tile id="4">
+   <image width="128" height="128" source="leafy_ground01.png"/>
+  </tile>
+  <tile id="5">
+   <image width="128" height="128" source="leafy_ground02.png"/>
+  </tile>
+  <tile id="6">
+   <image width="128" height="128" source="leafy_ground04.png"/>
+  </tile>
+  <tile id="7">
+   <image width="128" height="128" source="lava2.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="9" name="My tiles" tilewidth="128" tileheight="128" tilecount="7" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="128" height="128" source="ground05.png"/>
+  </tile>
+  <tile id="1">
+   <image width="128" height="128" source="leafy_ground01.png"/>
+  </tile>
+  <tile id="2">
+   <image width="128" height="128" source="leafy_ground02.png"/>
+  </tile>
+  <tile id="3">
+   <image width="128" height="128" source="leafy_ground04.png"/>
+  </tile>
+  <tile id="4">
+   <image width="128" height="128" source="ground03.png"/>
+  </tile>
+  <tile id="5">
+   <image width="128" height="128" source="ground04.png"/>
+  </tile>
+  <tile id="6">
+   <image width="128" height="128" source="lava2.png"/>
+  </tile>
+ </tileset>
+ <layer id="1" name="Plattform" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJzt2NEKgyAYBlAhamzv/8AxKPBiqau/1eoc+O5ME/sKSgkAAAAAANiqnwJcVzeFcxmOvgEuRc/PyZkQ6a49f2Q5ozueCfvZq+evQn5tyPIv9JxIe/X8WciSPsX/F3x3u0vr93nUu0HPiTQ//30ls9q4OV0hLddsXX/pPvI5hkpytbGtc7WO13Milfr46TvYOj46Ueuv2XPUut/OA1ybnhNpBKW1A/Y=
+  </data>
+ </layer>
+ <layer id="2" name="Death" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztw7ENAAAIA6CO/n+xR9TBARISAAAAAAAAAAAAAAAAAOiNL8OlBSrOAzE=
+  </data>
+ </layer>
+</map>
