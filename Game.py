@@ -16,6 +16,7 @@ LEFT_VIEWPORT_MARGIN = 300
 RIGHT_VIEWPORT_MARGIN = 300
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
+START_POSITION_X = 285
 
 class Game(arcade.Window):
 	def __init__(self, width, height, title):
@@ -24,23 +25,28 @@ class Game(arcade.Window):
 		self.groundList = None
 		self.playerList = None
 		self.deathList = None
+		self.end_list = None
 		self.Screen_Width = width
 		self.Screen_Height = height
 		self.right_button_pressed = False
 		self.left_button_pressed = False
 		self.jump_button_pressed = False
 		self.speed_x = 0
+		self.score_distance = 0
 
 	def setup(self):
 		#Setup the list
 		self.groundList = arcade.SpriteList()
 		self.playerList = arcade.SpriteList()
 		self.deathList = arcade.SpriteList()
+		self.end_list = arcade.SpriteList()
 
 		self.player = arcade.Sprite("Sprites/Used/Player.png", CHARACTERSCALING)
-		self.player.center_y = 420
-		self.player.center_x = 285
+		self.player.center_y = 285
+		self.player.center_x = START_POSITION_X
 		self.playerList.append(self.player)
+		self.score_distance = 0
+		self.speed_x = 0
 
 
 		# --- Load in a map from the tiled editor ---
@@ -49,6 +55,7 @@ class Game(arcade.Window):
 		# Names of the layers
 		platforms_layer_name = 'Plattform'
 		death_layer_name = 'Death'
+		end_layer_name = 'End'
 
 		# Read in the tiled map
 		my_map = arcade.tilemap.read_tmx(map_name)
@@ -56,6 +63,7 @@ class Game(arcade.Window):
 		# Read the tilemaps
 		self.groundList = arcade.tilemap.process_layer(my_map, platforms_layer_name, TILE_SCALING)
 		self.deathList = arcade.tilemap.process_layer(my_map, death_layer_name, TILE_SCALING)
+		self.end_list = arcade.tilemap.process_layer(my_map, end_layer_name, TILE_SCALING)
 
 		# Set the background color
 		if my_map.background_color:	
@@ -76,6 +84,11 @@ class Game(arcade.Window):
 		self.groundList.draw()
 		self.playerList.draw()
 		self.deathList.draw()
+		self.end_list.draw()
+		 # Draw our score on the screen, scrolling it with the viewport
+		score_text = f"Score: {self.score_distance}"
+		arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
+
 
 
 	#Resize the window if user wants
@@ -96,6 +109,7 @@ class Game(arcade.Window):
 			self.right_button_pressed = True
 			self.player.change_x = PLAYERMOVEMENTSPEED
 
+
 	def on_key_release(self, key, modifiers):
 		"""Called when the user releases a key. """
 		if key == arcade.key.UP or key == arcade.key.W:
@@ -106,27 +120,28 @@ class Game(arcade.Window):
 			self.right_button_pressed = False
 
 
-
+#Function to update movement speed to include accerelation and deaccerelation
 	def update_movement(self):
+		#Jump
 		if self.jump_button_pressed:
 			if self.physics_engine.can_jump():
 				self.player.change_y = PLAYER_JUMP_SPEED
 
-
+		#Left button pressed accerelation
 		if self.left_button_pressed and not self.right_button_pressed:
 			self.speed_x -= ACCELERATION
 
-			#Add movement to sprite
+			#Add movement to sprite and check if movementspeed is outside limits
 			if(self.speed_x < -PLAYERMOVEMENTSPEED):
 				self.speed_x = -PLAYERMOVEMENTSPEED
 			else:
 				self.player.change_x= self.speed_x
+		#Left button released deaccerelation
 		elif self.speed_x <0 and not self.right_button_pressed:
-			print("Hej")
 			self.speed_x += ACCELERATION
 			if(self.speed_x > 0):
 				self.speed_x = 0
-
+		#Right button pressed accerelation
 		if self.right_button_pressed and not self.left_button_pressed:
 			self.speed_x += ACCELERATION
 
@@ -134,26 +149,23 @@ class Game(arcade.Window):
 			if(self.speed_x > PLAYERMOVEMENTSPEED):
 				self.speed_x = PLAYERMOVEMENTSPEED
 				self.player.change_x = PLAYERMOVEMENTSPEED
-
+		#Right button released and deaccerelation
 		elif self.speed_x> 0 and not self.left_button_pressed:
 			self.speed_x -= ACCELERATION
 			if(self.speed_x < 0):
 				self.speed_x = 0
+		#Add the speed to the sprite
 		self.player.change_x = self.speed_x
-		print(self.speed_x)
-
-	def update(self, delta_time):
-		""" Movement and game logic """
-
-		# Call update on all sprites (The sprites don't do much in this
-		# example though.)
-		self.update_movement()
-		self.physics_engine.update()
-
-		if arcade.check_for_collision_with_list(self.player, self.deathList):
-			self.setup()
 
 
+	def update_score(self):
+	 	new_score =int((self.player.center_x-START_POSITION_X) / 64)
+	 	if new_score>self.score_distance:
+	 		self.score_distance = new_score
+		
+
+
+	def scrolling(self):
 		# --- Manage Scrolling ---
 
 		# Track if we need to change the viewport
@@ -192,3 +204,21 @@ class Game(arcade.Window):
 
 			# Do the Scrolling
 			arcade.set_viewport(self.view_left, self.Screen_Width + self.view_left, self.view_bottom, self.Screen_Height + self.view_bottom)
+
+	def update(self, delta_time):
+		""" Movement and game logic """
+
+		# Call update on all sprites (The sprites don't do much in this
+		# example though.)
+		self.update_movement()
+		self.physics_engine.update()
+
+		if arcade.check_for_collision_with_list(self.player, self.deathList):
+			self.setup()
+		if arcade.check_for_collision_with_list(self.player, self.end_list):
+			self.setup()
+
+		self.scrolling()
+		self.update_score()
+
+		
