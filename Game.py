@@ -1,14 +1,16 @@
 import arcade
+from datetime import time
 
 #Scaling of sprites
 TILE_SCALING = 0.5
 CHARACTERSCALING = 0.5
+ENEMYSCALING = 0.3
 
 #Player Constants!
-PLAYERMOVEMENTSPEED = 6
+PLAYERMOVEMENTSPEED = 7
 GRAVITY = 1
 PLAYER_JUMP_SPEED = 18
-ACCELERATION = 0.2
+ACCELERATION = 40
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -16,7 +18,7 @@ LEFT_VIEWPORT_MARGIN = 300
 RIGHT_VIEWPORT_MARGIN = 300
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
-START_POSITION_X = 285
+START_POSITION_X = 200
 
 class Game(arcade.Window):
 	def __init__(self, width, height, title):
@@ -42,7 +44,7 @@ class Game(arcade.Window):
 		self.end_list = arcade.SpriteList()
 
 		self.player = arcade.Sprite("Sprites/Used/Player.png", CHARACTERSCALING)
-		self.player.center_y = 285
+		self.player.center_y = 200
 		self.player.center_x = START_POSITION_X
 		self.playerList.append(self.player)
 		self.score_distance = 0
@@ -56,6 +58,7 @@ class Game(arcade.Window):
 		platforms_layer_name = 'Plattform'
 		death_layer_name = 'Death'
 		end_layer_name = 'End'
+		enemy_layer_name = 'Enemy'
 
 		# Read in the tiled map
 		my_map = arcade.tilemap.read_tmx(map_name)
@@ -121,7 +124,7 @@ class Game(arcade.Window):
 
 
 #Function to update movement speed to include accerelation and deaccerelation
-	def update_movement(self):
+	def update_movement(self, delta_time):
 		#Jump
 		if self.jump_button_pressed:
 			if self.physics_engine.can_jump():
@@ -129,33 +132,33 @@ class Game(arcade.Window):
 
 		#Left button pressed accerelation
 		if self.left_button_pressed and not self.right_button_pressed:
-			self.speed_x -= ACCELERATION
+			self.speed_x -= ACCELERATION * delta_time
 
 			#Add movement to sprite and check if movementspeed is outside limits
 			if(self.speed_x < -PLAYERMOVEMENTSPEED):
 				self.speed_x = -PLAYERMOVEMENTSPEED
-			else:
-				self.player.change_x= self.speed_x
 		#Left button released deaccerelation
 		elif self.speed_x <0 and not self.right_button_pressed:
-			self.speed_x += ACCELERATION
+			self.speed_x += ACCELERATION * delta_time
 			if(self.speed_x > 0):
 				self.speed_x = 0
+		
+
 		#Right button pressed accerelation
 		if self.right_button_pressed and not self.left_button_pressed:
-			self.speed_x += ACCELERATION
+			self.speed_x += ACCELERATION * delta_time
 
 			#Add movement to sprite
 			if(self.speed_x > PLAYERMOVEMENTSPEED):
 				self.speed_x = PLAYERMOVEMENTSPEED
-				self.player.change_x = PLAYERMOVEMENTSPEED
 		#Right button released and deaccerelation
 		elif self.speed_x> 0 and not self.left_button_pressed:
-			self.speed_x -= ACCELERATION
+			self.speed_x -= ACCELERATION * delta_time
 			if(self.speed_x < 0):
 				self.speed_x = 0
 		#Add the speed to the sprite
-		self.player.change_x = self.speed_x
+		self.player.change_x = self.speed_x 
+		print(self.speed_x)
 
 
 	def update_score(self):
@@ -210,7 +213,7 @@ class Game(arcade.Window):
 
 		# Call update on all sprites (The sprites don't do much in this
 		# example though.)
-		self.update_movement()
+		self.update_movement(delta_time)
 		self.physics_engine.update()
 
 		if arcade.check_for_collision_with_list(self.player, self.deathList):

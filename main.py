@@ -2,7 +2,7 @@ import arcade
 from Game import Game
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Starting Template"
+SCREEN_TITLE = "NEAT ALGORITHM FOR A 2D PLATTFORM GAME"
 
 
 def main():
