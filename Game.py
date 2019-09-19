@@ -1,5 +1,6 @@
 import arcade
 from datetime import time
+import neat
 
 #Scaling of sprites
 TILE_SCALING = 0.5
@@ -153,7 +154,7 @@ class Game(arcade.Window):
 			self.right_button_pressed = False
 
 
-#Function to update movement speed to include accerelation and deaccerelation
+	#Function to update movement speed to include accerelation and deaccerelation
 	def update_movement(self, delta_time):
 		#Jump
 		if self.jump_button_pressed:
@@ -206,6 +207,9 @@ class Game(arcade.Window):
 		
 
 	 #Managing the scrolling of the screen
+
+
+	#Scroll the screen
 	def scrolling(self):
 		# Track if we need to change the viewport
 		changed = False
@@ -243,6 +247,8 @@ class Game(arcade.Window):
 			# Do the Scrolling
 			arcade.set_viewport(self.view_left, self.Screen_Width + self.view_left, self.view_bottom, self.Screen_Height + self.view_bottom)
 
+
+	#Update all sprites		
 	def update(self, delta_time):
 
 
