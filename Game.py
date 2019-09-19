@@ -2,6 +2,7 @@ import arcade
 from datetime import time
 import neat
 
+
 #Scaling of sprites
 TILE_SCALING = 0.5
 CHARACTER_SCALING = 0.4
@@ -38,6 +39,7 @@ class Game(arcade.Window):
 		self.death_list = None
 		self.end_list = None
 		self.enemy_list = None
+		self.player = None
 
 		#Screen variables
 		self.Screen_Width = width
@@ -52,6 +54,12 @@ class Game(arcade.Window):
 		#Game specific variables
 		self.game_over = False
 		self.score_distance = 0
+
+		#Neat
+		self.config_neat = None
+
+	def setup_neat(self, config_file): 
+		self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
 
 
 	#Game setup, Initliaze and load variables.
@@ -206,10 +214,7 @@ class Game(arcade.Window):
 	 		self.score_distance = new_score
 		
 
-	 #Managing the scrolling of the screen
-
-
-	#Scroll the screen
+	#Managing the scrolling of the screen
 	def scrolling(self):
 		# Track if we need to change the viewport
 		changed = False
