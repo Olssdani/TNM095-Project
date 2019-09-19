@@ -3,8 +3,8 @@ from datetime import time
 
 #Scaling of sprites
 TILE_SCALING = 0.5
-CHARACTERSCALING = 0.5
-ENEMYSCALING = 0.3
+CHARACTERSCALING = 0.4
+ENEMYSCALING = 0.5
 
 #Player Constants!
 PLAYERMOVEMENTSPEED = 7
@@ -28,12 +28,14 @@ class Game(arcade.Window):
 		self.playerList = None
 		self.deathList = None
 		self.end_list = None
+		self.enemy_list = None
 		self.Screen_Width = width
 		self.Screen_Height = height
 		self.right_button_pressed = False
 		self.left_button_pressed = False
 		self.jump_button_pressed = False
 		self.speed_x = 0
+		self.game_over = False
 		self.score_distance = 0
 
 	def setup(self):
@@ -42,6 +44,7 @@ class Game(arcade.Window):
 		self.playerList = arcade.SpriteList()
 		self.deathList = arcade.SpriteList()
 		self.end_list = arcade.SpriteList()
+		self.enemy_list = arcade.SpriteList()
 
 		self.player = arcade.Sprite("Sprites/Used/Player.png", CHARACTERSCALING)
 		self.player.center_y = 200
@@ -67,6 +70,10 @@ class Game(arcade.Window):
 		self.groundList = arcade.tilemap.process_layer(my_map, platforms_layer_name, TILE_SCALING)
 		self.deathList = arcade.tilemap.process_layer(my_map, death_layer_name, TILE_SCALING)
 		self.end_list = arcade.tilemap.process_layer(my_map, end_layer_name, TILE_SCALING)
+		self.enemy_list = arcade.tilemap.process_layer(my_map, enemy_layer_name, ENEMYSCALING)
+
+		for enemy in self.enemy_list:
+			enemy.change_x = 2
 
 		# Set the background color
 		if my_map.background_color:	
@@ -74,7 +81,6 @@ class Game(arcade.Window):
 
 		# Create the 'physics engine'
 		self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.groundList, GRAVITY)
-	
 		#Used to keep track of our scrolling
 		self.view_bottom = 0
 		self.view_left = 0
@@ -88,6 +94,7 @@ class Game(arcade.Window):
 		self.playerList.draw()
 		self.deathList.draw()
 		self.end_list.draw()
+		self.enemy_list.draw()
 		 # Draw our score on the screen, scrolling it with the viewport
 		score_text = f"Score: {self.score_distance}"
 		arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
@@ -214,12 +221,29 @@ class Game(arcade.Window):
 		# Call update on all sprites (The sprites don't do much in this
 		# example though.)
 		self.update_movement(delta_time)
-		self.physics_engine.update()
+		#self.physics_engine.update()
+		#self.enemy_list.update()
 
-		if arcade.check_for_collision_with_list(self.player, self.deathList):
-			self.setup()
-		if arcade.check_for_collision_with_list(self.player, self.end_list):
-			self.setup()
+		 # Update the player based on the physics engine
+		if not self.game_over:
+			# Move the enemies
+			self.enemy_list.update()
+
+			# Check each enemy
+			for enemy in self.enemy_list:
+				# If the enemy hit a wall, reverse
+				if len(arcade.check_for_collision_with_list(enemy, self.groundList)) > 0:
+					enemy.change_x *= -1
+			# Update the player using the physics engine
+			self.physics_engine.update()
+
+			# See if the player hit a worm. If so, game over.
+			if len(arcade.check_for_collision_with_list(self.player, self.enemy_list)) > 0:
+				self.setup()
+			if arcade.check_for_collision_with_list(self.player, self.deathList):
+				self.setup()
+			if arcade.check_for_collision_with_list(self.player, self.end_list):
+				self.setup()
 
 		self.scrolling()
 		self.update_score()

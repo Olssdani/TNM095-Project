@@ -38,21 +38,19 @@
   <tile id="3">
    <image width="128" height="128" source="leafy_ground04.png"/>
    <objectgroup draworder="index">
-    <object id="4" x="0.181818" y="0" width="127.818" height="75.2727"/>
+    <object id="5" x="0" y="0" width="128" height="64"/>
    </objectgroup>
   </tile>
   <tile id="4">
    <image width="128" height="128" source="ground03.png"/>
    <objectgroup draworder="index">
-    <object id="1" x="-0.363636" y="0.181818" width="128.545" height="75.4545"/>
+    <object id="1" x="0" y="0" width="128"/>
    </objectgroup>
   </tile>
   <tile id="5">
    <image width="128" height="128" source="ground04.png"/>
    <objectgroup draworder="index">
     <object id="8" x="0" y="0" width="127.818" height="75.2727"/>
-    <object id="9" x="128" y="0"/>
-    <object id="10" x="49.2727" y="-40"/>
    </objectgroup>
   </tile>
   <tile id="6">
@@ -61,18 +59,24 @@
   <tile id="8">
    <image width="128" height="128" source="Coin.png"/>
   </tile>
-  <tile id="9">
-   <image width="128" height="128" source="Enemy.png"/>
+  <tile id="10">
+   <image width="64" height="64" source="Enemy.png"/>
+   <objectgroup draworder="index">
+    <object id="1" x="0" y="0" width="64" height="64"/>
+    <object id="3" x="0" y="0">
+     <polyline points="0,0 0,64 64,64 64,0 0,0"/>
+    </object>
+   </objectgroup>
   </tile>
  </tileset>
  <layer id="1" name="Plattform" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt2NEKhCAUhGFBNHbp/Z93WUg4F6Wnmsrk/2DuTJOahEIAAAAAAAAAAABnpSUAxhWXoC/56RvAUOh5n3gmULI9n0085pW8xWTSI3oOpavO828ld8smb0HPoXRVzz+VbElB/1/w3+0Yju/zqW8DPYdSef9TI0VrXEmsxHPN2fW37sPOkRuxWmO9c3nH03Mo1fq4dg56x6ujWv/InlXr7p0HwNjoOZR+XgwEVg==
+   eJzt2NEKwyAMheFA0WHZ+z/vECxkxWqsYRvu/+DcrJ066ElhIgAAAAAAAAAAYFYoAbCurQS/JX77AFiKR8+fKhDZS2Ywe+FJ9/yf+vpQ8ZT7nUpmuk7P4Wnmfd6aB3sjnxZV7rKcW3e81XXLWvQcnkZ7bu3p+XnXuRKk/7/g6JzI3d7k/jw7ZkPr3Fmt47Wu75XPaug5PB3Pf+jkkAz3Bnnv1jmW78zuf3UOUddiJ1rq3Nuaa+m0TjKsR8/hqdXH2nvQer93vPa/85u99h1dB8Da6Dk8vQCcAQWA
   </data>
  </layer>
  <layer id="4" name="Enemy" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt0zEKwCAMBVBX7db7H7Z0kVC02ExF3oOAKCZk+KUAAAAAAAAAAACsOUIB+7mzXUPJOrto4Xwme2T+jTKUnf/FbN9nxley3l7e4E+quf1+VJleAAAwcwGeKAFh
+   eJztzcEJAAAIAzF3cP9dXUIRNHlfaQQAAAAAAAAAAAAA/JPDfde2w/Y/AAAAdxSpfABN
   </data>
  </layer>
  <layer id="3" name="End" width="250" height="15">
