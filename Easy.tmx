@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="128" tileheight="128" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" name="Easy" tilewidth="128" tileheight="128" tilecount="7" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="128" height="128" source="Coin.png"/>
+  </tile>
+  <tile id="1">
+   <image width="64" height="64" source="Enemy.png"/>
+  </tile>
+  <tile id="2">
+   <image width="128" height="128" source="lava2.png"/>
+  </tile>
+  <tile id="3">
+   <image width="128" height="128" source="leafy_ground01.png"/>
+  </tile>
+  <tile id="4">
+   <image width="128" height="128" source="leafy_ground02.png"/>
+  </tile>
+  <tile id="5">
+   <image width="128" height="128" source="leafy_ground04.png"/>
+  </tile>
+  <tile id="6">
+   <image width="128" height="128" source="ground05.png"/>
+  </tile>
+ </tileset>
+ <layer id="1" name="Plattform" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztltEKwzAIRfNQuv//4zFYQCQ1NeoI3TkgrLQaNd5krQEAAAAAAAAAAAAAAADAjONrALDO7hp6fe2pHI2zDGr5zNbuGnqyznv/u6H1GMfA/h05Y9E4lX3dTedZdWqNV2h9NPe/nH+9lndt7Tv7trqfK+iaT2FN/R69j64te7FCz0P3Vb7PyLdS5yszn3U2jmYyOptay9Ya1YzuEU99+r+m5VfVzyhZd2l0bW8OI114Yp3Nr3+5V1d3knVvWWbFjvjM8rJmMlLvnbh6nzx1zJ6vcunM6hv5a9/VuiXeOZF+3hhZOl+dbUubnpwz7glvvtb87GBVeWXGvRNLfzN7rsg7q+YWiCX9ojFWydzzuzHlOZdRT2V/AGB/3qU7DAw=
+  </data>
+ </layer>
+ <layer id="2" name="Death" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztwzEJAAAMA7BC/XuuiH0jgSQAAAAAAAAAAAAAAAAAcFf1/QH5lwLv
+  </data>
+ </layer>
+ <layer id="3" name="End" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJzt08EJACAQA8EIgv137Oe+NhBnYEvYBAAAAAAAAHjZE9DrTEAvn0M/n0M/n0O3FZ/DD3wOAD0uB30AXg==
+  </data>
+ </layer>
+ <layer id="4" name="Enemy" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztwYEAAAAAw6D5Ux/hAlUBAAAAAAAAAAAAAAAAAMA3OpgAAQ==
+  </data>
+ </layer>
+</map>

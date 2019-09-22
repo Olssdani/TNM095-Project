@@ -2,7 +2,7 @@ import arcade
 from datetime import time
 import neat
 
-
+import gc
 #Scaling of sprites
 TILE_SCALING = 0.5
 CHARACTER_SCALING = 0.4
@@ -81,7 +81,7 @@ class Game(arcade.Window):
 
 		# --- Load in a map from the tiled editor ---
 		# Name of map file to load
-		map_name = "Level1.tmx"
+		map_name = "Easy.tmx"
 		
 		# Names of the layers
 		platforms_layer_name = 'Plattform'
@@ -112,7 +112,6 @@ class Game(arcade.Window):
 		#Used to keep track of our scrolling
 		self.view_bottom = 0
 		self.view_left = 0
-
 
 	#Draw all sprites during rendering
 	def on_draw(self):
@@ -256,7 +255,7 @@ class Game(arcade.Window):
 	#Update all sprites		
 	def update(self, delta_time):
 
-
+		should_end = False
 		#Update the movement on the player
 		self.update_movement(delta_time)
 
@@ -280,13 +279,23 @@ class Game(arcade.Window):
 			TODO STORE SCORE FOR EVALUATING
 			'''
 			if len(arcade.check_for_collision_with_list(self.player, self.enemy_list)) > 0:
-				self.setup()
+				should_end = True
 			if arcade.check_for_collision_with_list(self.player, self.death_list):
-				self.setup()
+				should_end = True
 			if arcade.check_for_collision_with_list(self.player, self.end_list):
-				self.setup()
+				should_end = True
 
 		self.scrolling()
 		self.update_score()
 
-		
+		if should_end:
+			window = arcade.get_window()
+
+			window.close()
+			del window
+
+			gc.collect()	
+			#arcade.close_window()
+	def run(self):
+		arcade.run()
+		print("fun!")	
