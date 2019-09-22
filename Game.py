@@ -1,6 +1,9 @@
 import arcade
 from datetime import time
 import neat
+from neat.reporting import ReporterSet
+from neat.math_util import mean
+from neat.six_util import iteritems, itervalues
 
 import gc
 #Scaling of sprites
@@ -57,9 +60,24 @@ class Game(arcade.Window):
 
 		#Neat
 		self.config_neat = None
+		self.p = None
+		self.gnomes = None
+		self.current_genome_index = 0
+		self.current_genome = None
+
 
 	def setup_neat(self, config_file): 
 		self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
+
+		self.p = neat.Population(self.config_neat)	
+
+		self.genomes = list(iteritems(self. p.population))
+
+	#TODO Implement the code to evolve the genomes
+	def evolve_genomes(self):
+		print("Evovle")
+		
+
 
 
 	#Game setup, Initliaze and load variables.
@@ -113,6 +131,13 @@ class Game(arcade.Window):
 		self.view_bottom = 0
 		self.view_left = 0
 
+		#Neat
+		if(self.current_genome_index > len(self.genomes) - 1):
+			evolve_genomes()
+			self.current_genome_index = 0
+
+		self.current_genome = self.genomes[self.current_genome_index]
+
 	#Draw all sprites during rendering
 	def on_draw(self):
 		#Start the rendering
@@ -124,7 +149,8 @@ class Game(arcade.Window):
 		self.death_list.draw()
 		self.end_list.draw()
 		self.enemy_list.draw()
-		
+		print(self.plattform_list.__getitem__(1).center_x)
+
 		# Draw our score on the screen, scrolling it with the viewport
 		score_text = f"Score: {self.score_distance}"
 		arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
@@ -137,6 +163,9 @@ class Game(arcade.Window):
 		self.Screen_Height = height
 
 
+	def update_controlls():
+		print("Update controlls from neat")
+	
 	#Oncall method on key press, sets specific variable to true and the movement is handle elsewhere
 	def on_key_press(self, key, modifiers):
 		"""Called whenever a key is pressed. """
@@ -254,8 +283,12 @@ class Game(arcade.Window):
 
 	#Update all sprites		
 	def update(self, delta_time):
-
+		#Variable definition
 		should_end = False
+		
+
+
+
 		#Update the movement on the player
 		self.update_movement(delta_time)
 
@@ -289,13 +322,8 @@ class Game(arcade.Window):
 		self.update_score()
 
 		if should_end:
-			window = arcade.get_window()
+			print("End")
 
-			window.close()
-			del window
-
-			gc.collect()	
-			#arcade.close_window()
 	def run(self):
 		arcade.run()
 		print("fun!")	
