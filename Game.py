@@ -4,6 +4,7 @@ import neat
 from neat.reporting import ReporterSet
 from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
+from arcade.arcade_types import Point
 
 import gc
 #Scaling of sprites
@@ -24,6 +25,7 @@ RIGHT_VIEWPORT_MARGIN = 300
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 START_POSITION_X = 200
+INPUT_GRID_SIZE = 7 #Keep uneven!!!
 
 
 class Game(arcade.Window):
@@ -64,14 +66,18 @@ class Game(arcade.Window):
 		self.gnomes = None
 		self.current_genome_index = 0
 		self.current_genome = None
-
-
+		self.input_tiles = None
+		self.last_position_x = 0
+		self.last_position_y = 0
+		self.tile_step = INPUT_GRID_SIZE//2
 	def setup_neat(self, config_file): 
 		self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
 
 		self.p = neat.Population(self.config_neat)	
 
 		self.genomes = list(iteritems(self. p.population))
+
+		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
 	#TODO Implement the code to evolve the genomes
 	def evolve_genomes(self):
@@ -149,7 +155,7 @@ class Game(arcade.Window):
 		self.death_list.draw()
 		self.end_list.draw()
 		self.enemy_list.draw()
-		print(self.plattform_list.__getitem__(1).center_x)
+		
 
 		# Draw our score on the screen, scrolling it with the viewport
 		score_text = f"Score: {self.score_distance}"
@@ -162,8 +168,83 @@ class Game(arcade.Window):
 		self.Screen_Width = width
 		self.Screen_Height = height
 
+	def print_input_tile(self):
+		#Print tile, for debug use only
+		for y in range(INPUT_GRID_SIZE):
+			for x in range(INPUT_GRID_SIZE):
+				if(x == INPUT_GRID_SIZE-1):
+					print(self.input_tiles[y][x])
+				else:
+					print(self.input_tiles[y][x], end=' ')
 
-	def update_controlls():
+
+		print(" ")
+
+	def get_tile_sort(self, point):
+		if len(arcade.get_sprites_at_point(point, self.plattform_list)) > 0:
+			return 1
+		elif len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0:
+			return -1
+		else:
+			return 0
+	#Get tiles in a souranding area around the player as input.
+	#Value for the tiles is hostile =-1, nothing = 0 and plattform =1
+	def get_input_tiles(self):
+		#Get the tile position that the player are on
+		player_x = (self.player.center_x // 64 ) * 64 + 32
+		player_y = (self.player.center_y // 64 ) * 64 + 32
+		
+		#Check if player have moved into another tile
+		if(self.last_position_y !=player_y or self.last_position_x != player_x):
+			#print("Last: " +str(self.last_position_x) + " New: " + str(player_x))
+			#If player has moved into another square in both directions 
+			
+			if(self.last_position_y !=player_y and self.last_position_x != player_x):
+				for y in range(INPUT_GRID_SIZE):
+					for x in range(INPUT_GRID_SIZE):
+						point  = (player_x+(x-self.tile_step)*64, player_y-(y-self.tile_step)*64)
+						self.input_tiles[y][x] = self.get_tile_sort(point)			
+			
+			elif (self.last_position_x < player_x):
+
+				for y in range(INPUT_GRID_SIZE):
+					for x in range(1,INPUT_GRID_SIZE):
+						self.input_tiles[y][x-1] = self.input_tiles[y][x]
+				for y in range(INPUT_GRID_SIZE):
+					point  = (player_x+(self.tile_step)*64, player_y-(y-self.tile_step)*64)
+					self.input_tiles[y][INPUT_GRID_SIZE-1] = self.get_tile_sort(point)
+			
+			elif (self.last_position_x > player_x):
+				for y in range(INPUT_GRID_SIZE):
+					for x in range(INPUT_GRID_SIZE-2, -1, -1):
+						self.input_tiles[y][x+1] = self.input_tiles[y][x]
+				for y in range(INPUT_GRID_SIZE):
+					point  = (player_x-(self.tile_step)*64, player_y-(y-self.tile_step)*64)
+					self.input_tiles[y][0] = self.get_tile_sort(point)
+			
+			
+			elif (self.last_position_y < player_y):
+				
+				for x in range(INPUT_GRID_SIZE):
+					for y in range(INPUT_GRID_SIZE-2, -1, -1):
+						self.input_tiles[y+1][x] = self.input_tiles[y][x]
+				for x in range(INPUT_GRID_SIZE):
+					point  = (player_x-(x-self.tile_step)*64, player_y+(self.tile_step)*64)
+					self.input_tiles[0][x] = self.get_tile_sort(point)
+			elif (self.last_position_y > player_y):		
+				for x in range(INPUT_GRID_SIZE):
+					for y in range(INPUT_GRID_SIZE-1):
+						self.input_tiles[y][x] = self.input_tiles[y + 1][x]
+				for x in range(INPUT_GRID_SIZE):
+					point  = (player_x + (x - self.tile_step) * 64, player_y - self.tile_step * 64)
+					self.input_tiles[INPUT_GRID_SIZE-1][x] = self.get_tile_sort(point)
+				
+			#self.print_input_tile()
+		#Update last postion
+		self.last_position_x = player_x
+		self.last_position_y = player_y
+
+	def update_controlls(self):
 		print("Update controlls from neat")
 	
 	#Oncall method on key press, sets specific variable to true and the movement is handle elsewhere
@@ -286,6 +367,7 @@ class Game(arcade.Window):
 		#Variable definition
 		should_end = False
 		
+		self.get_input_tiles()
 
 
 
@@ -322,8 +404,9 @@ class Game(arcade.Window):
 		self.update_score()
 
 		if should_end:
+			self.setup()
 			print("End")
 
 	def run(self):
 		arcade.run()
-		print("fun!")	
+		
