@@ -5,6 +5,7 @@ from neat.reporting import ReporterSet
 from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
 from arcade.arcade_types import Point
+import numpy as np
 
 import gc
 #Scaling of sprites
@@ -71,6 +72,8 @@ class Game(arcade.Window):
 		self.last_position_x = 0
 		self.last_position_y = 0
 		self.tile_step = INPUT_GRID_SIZE//2
+		self.net = None
+		self.counter = 0
 
 		
 	def setup_neat(self, config_file): 
@@ -82,12 +85,11 @@ class Game(arcade.Window):
 
 		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
+
 	#TODO Implement the code to evolve the genomes
 	def evolve_genomes(self):
 		print("Evovle")
 		
-
-
 
 	#Game setup, Initliaze and load variables.
 	def setup(self):
@@ -144,10 +146,12 @@ class Game(arcade.Window):
 
 		#Neat
 		if(self.current_genome_index > len(self.genomes) - 1):
-			evolve_genomes()
+			self.evolve_genomes()
 			self.current_genome_index = 0
 
-		self.current_genome = self.genomes[self.current_genome_index]
+		self.current_genome = self.genomes[self.current_genome_index][1]
+
+		self.net = neat.nn.recurrent.RecurrentNetwork.create(self.current_genome, self.config_neat)
 
 	#Draw all sprites during rendering
 	def on_draw(self):
@@ -174,6 +178,8 @@ class Game(arcade.Window):
 		self.Screen_Width = width
 		self.Screen_Height = height
 
+
+	#Print the input tiles in the console, used for debug
 	def print_input_tile(self):
 		#Print tile, for debug use only
 		for y in range(INPUT_GRID_SIZE):
@@ -186,15 +192,22 @@ class Game(arcade.Window):
 
 		print(" ")
 
+
+	#Return value for the tile depending on whats on that tile
 	def get_tile_sort(self, point):
+		#Value for the tiles is hostile =-1, nothing = 0 and plattform =1
+		#Plattform
 		if len(arcade.get_sprites_at_point(point, self.plattform_list)) > 0:
 			return 1
+		#Enemy
 		elif len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0:
 			return -1
+		#Rest
 		else:
 			return 0
+	
+
 	#Get tiles in a souranding area around the player as input.
-	#Value for the tiles is hostile =-1, nothing = 0 and plattform =1
 	def get_input_tiles(self):
 		#Get the tile position that the player are on
 		player_x = (self.player.center_x // 64 ) * 64 + 32
@@ -245,14 +258,12 @@ class Game(arcade.Window):
 					point  = (player_x + (x - self.tile_step) * 64, player_y - self.tile_step * 64)
 					self.input_tiles[INPUT_GRID_SIZE-1][x] = self.get_tile_sort(point)
 				
-			self.print_input_tile()
+			#self.print_input_tile()
 		#Update last postion
 		self.last_position_x = player_x
 		self.last_position_y = player_y
-
-	def update_controlls(self):
-		print("Update controlls from neat")
 	
+
 	#Oncall method on key press, sets specific variable to true and the movement is handle elsewhere
 	def on_key_press(self, key, modifiers):
 		"""Called whenever a key is pressed. """
@@ -327,6 +338,9 @@ class Game(arcade.Window):
 	 	#Make sure that the score does not decrease if going backwards
 	 	if new_score>self.score_distance:
 	 		self.score_distance = new_score
+	 		self.counter = 0
+	 	else:
+	 		self.counter +=1 
 		
 
 	#Managing the scrolling of the screen
@@ -372,11 +386,22 @@ class Game(arcade.Window):
 	def update(self, delta_time):
 		#Variable definition
 		should_end = False
-		
+		inputs = list(())
 		self.get_input_tiles()
-
-
-
+		for y in range(INPUT_GRID_SIZE):
+			for x in range(INPUT_GRID_SIZE):
+				inputs.append(self.input_tiles[y][x])
+	
+		
+		nnOutput = self.net.activate(inputs)
+		#print(nnOutput)
+		nnOutput[0] = round(nnOutput[0])
+		nnOutput[1] = round(nnOutput[1])
+		nnOutput[2] = round(nnOutput[2])
+		print(nnOutput)
+		self.left_button_pressed = nnOutput[0]
+		self.jump_button_pressed = nnOutput[1]
+		self.right_button_pressed = nnOutput[2]
 		#Update the movement on the player
 		self.update_movement(delta_time)
 
@@ -409,9 +434,16 @@ class Game(arcade.Window):
 		self.scrolling()
 		self.update_score()
 
+		if self.counter > 200:
+			self.counter = 0
+			should_end = True
 		if should_end:
+			self.genomes[self.current_genome_index][1].fitness = self.score_distance
+			self.current_genome_index +=1
+			print("On genome number: " + str(self.current_genome_index))
 			self.setup()
-			print("End")
+			
+
 
 	def run(self):
 		arcade.run()

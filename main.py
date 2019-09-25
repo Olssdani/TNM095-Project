@@ -14,7 +14,7 @@ def main():
 
 	#Initalize and start game
 	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-	game.setup_neat(config_path)
+	game.setup_neat("D:\Programmering\TNM095-Project\config")
 	game.setup()
 	game.run()
 
