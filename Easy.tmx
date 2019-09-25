@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#212121" nextlayerid="5" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#212121" nextlayerid="6" nextobjectid="1">
  <tileset firstgid="1" name="Easy" tilewidth="128" tileheight="128" tilecount="7" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -26,7 +26,12 @@
  </tileset>
  <layer id="1" name="Plattform" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJztltEKwzAIRfNQuv//4zFYQCQ1NeoI3TkgrLQaNd5krQEAAAAAAAAAAAAAAADAjONrALDO7hp6fe2pHI2zDGr5zNbuGnqyznv/u6H1GMfA/h05Y9E4lX3dTedZdWqNV2h9NPe/nH+9lndt7Tv7trqfK+iaT2FN/R69j64te7FCz0P3Vb7PyLdS5yszn3U2jmYyOptay9Ya1YzuEU99+r+m5VfVzyhZd2l0bW8OI114Yp3Nr3+5V1d3knVvWWbFjvjM8rJmMlLvnbh6nzx1zJ6vcunM6hv5a9/VuiXeOZF+3hhZOl+dbUubnpwz7glvvtb87GBVeWXGvRNLfzN7rsg7q+YWiCX9ojFWydzzuzHlOZdRT2V/AGB/3qU7DAw=
+   eJzt1tsKwyAMgGEvSn3/Nx67EILEQxJtS/t/ILRsanSJLiUAAAAAAAAAAAAAAPY77g7g4w7RgB3+uZXvDqIhN57fRO5/TtR61KG0rys5Fq2hXfv61DpftU7tjF1d61reX5n/9VzWueu+o+/u3k+Pes2naKl61j6Pzi3vEY8SR6seo/FeUeeenF91NrbGiORmXct3no+t+WfXV/fv9du1n1Gr7tLI3IUlBq0uLGOdab7+td+4dSf17q1ey52xI31GcY32ybteTz5Z1jF6n41lZs97Z4RnPyVrnsh+1jFW1bkntyUtBkvMK+7d0f4+6X878AXyTC3vSXkGgFk/gBsFDg==
+  </data>
+ </layer>
+ <layer id="5" name="Background" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJzt1NEKgCAMQFEfAv//j3sxCEvT3Ka4e0AoqM3NVggAAAAAAAAAAAAAvhxpAdjPNd8xLQB78jLjHmoESjzMeQw+6rRCP5+keqHV193PK74sixyWPY2Fa61cs+pclWQfmPN+pfkbrbcW1/r7z3P15u75R8yudUXSPbCY89r5tX7bVktrX5JxW2Llz3zda+xbquYwEOv+3miMvyTPvCVmbQ8aNWjQjN1jhT0AKzgBc28HVw==
   </data>
  </layer>
  <layer id="2" name="Death" width="250" height="15">
@@ -36,7 +41,7 @@
  </layer>
  <layer id="3" name="End" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt08EJACAQA8EIgv137Oe+NhBnYEvYBAAAAAAAAHjZE9DrTEAvn0M/n0M/n0O3FZ/DD3wOAD0uB30AXg==
+   eJztzjEBAAAMAiDXv/QyePlAAhIAAAAAAAAAAAAAANi4dQAAAKg8RlwAAg==
   </data>
  </layer>
  <layer id="4" name="Enemy" width="250" height="15">

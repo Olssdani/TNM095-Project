@@ -45,6 +45,7 @@ class Game(arcade.Window):
 		self.end_list = None
 		self.enemy_list = None
 		self.player = None
+		self.background_list = None
 
 		#Screen variables
 		self.Screen_Width = width
@@ -70,6 +71,8 @@ class Game(arcade.Window):
 		self.last_position_x = 0
 		self.last_position_y = 0
 		self.tile_step = INPUT_GRID_SIZE//2
+
+		
 	def setup_neat(self, config_file): 
 		self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
 
@@ -94,6 +97,7 @@ class Game(arcade.Window):
 		self.death_list = arcade.SpriteList()
 		self.end_list = arcade.SpriteList()
 		self.enemy_list = arcade.SpriteList()
+		self.background_list = arcade.SpriteList()
 
 		#Initalize the player sprite and vairables
 		self.player = arcade.Sprite("Sprites/Used/Player.png", CHARACTER_SCALING)
@@ -112,6 +116,7 @@ class Game(arcade.Window):
 		death_layer_name = 'Death'
 		end_layer_name = 'End'
 		enemy_layer_name = 'Enemy'
+		plattform_layer_name = 'Background'
 
 		# Read in the tiled map
 		my_map = arcade.tilemap.read_tmx(map_name)
@@ -121,7 +126,7 @@ class Game(arcade.Window):
 		self.death_list = arcade.tilemap.process_layer(my_map, death_layer_name, TILE_SCALING)
 		self.end_list = arcade.tilemap.process_layer(my_map, end_layer_name, TILE_SCALING)
 		self.enemy_list = arcade.tilemap.process_layer(my_map, enemy_layer_name, ENEMY_SCALING)
-
+		self.background_list = arcade.tilemap.process_layer(my_map, plattform_layer_name, TILE_SCALING)
 		#Set the movement for the enemies
 		for enemy in self.enemy_list:
 			enemy.change_x = 2
@@ -155,6 +160,7 @@ class Game(arcade.Window):
 		self.death_list.draw()
 		self.end_list.draw()
 		self.enemy_list.draw()
+		self.background_list.draw()
 		
 
 		# Draw our score on the screen, scrolling it with the viewport
@@ -239,7 +245,7 @@ class Game(arcade.Window):
 					point  = (player_x + (x - self.tile_step) * 64, player_y - self.tile_step * 64)
 					self.input_tiles[INPUT_GRID_SIZE-1][x] = self.get_tile_sort(point)
 				
-			#self.print_input_tile()
+			self.print_input_tile()
 		#Update last postion
 		self.last_position_x = player_x
 		self.last_position_y = player_y
