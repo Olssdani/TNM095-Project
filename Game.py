@@ -5,9 +5,8 @@ from neat.reporting import ReporterSet
 from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
 from arcade.arcade_types import Point
-import numpy as np
-
 import gc
+
 #Scaling of sprites
 TILE_SCALING = 0.5
 CHARACTER_SCALING = 0.4
@@ -207,32 +206,38 @@ class Game(arcade.Window):
 			return 0
 	
 
-	#Get tiles in a souranding area around the player as input.
+	#Get tiles in a surrounding area around the player as input. Each tile corresponds to
+	#a number where platfrom = 1, nothing = 0 and enemy = -1. Number of tiles is controlled
+	#by the constant variable INPUT_GRID_SIZE
 	def get_input_tiles(self):
-		#Get the tile position that the player are on
+		#Get the tile position that the player is on. The player position is clamp to an int and
+		#is offset to half a tile size to get it to the center position
 		player_x = (self.player.center_x // 64 ) * 64 + 32
 		player_y = (self.player.center_y // 64 ) * 64 + 32
 		
-		#Check if player have moved into another tile
+		#Check if player have moved into another tile otherwise do not update the input tiles
 		if(self.last_position_y !=player_y or self.last_position_x != player_x):
-			#print("Last: " +str(self.last_position_x) + " New: " + str(player_x))
-			#If player has moved into another square in both directions 
 			
+			#If player has moved into another square in both directions, update the whole tile set
+			#TODO optimize this by push the current tiles and just update the outer tiles	
 			if(self.last_position_y !=player_y and self.last_position_x != player_x):
 				for y in range(INPUT_GRID_SIZE):
 					for x in range(INPUT_GRID_SIZE):
 						point  = (player_x+(x-self.tile_step)*64, player_y-(y-self.tile_step)*64)
 						self.input_tiles[y][x] = self.get_tile_sort(point)			
 			
+			#If the player has moved to the right
 			elif (self.last_position_x < player_x):
-
+				#Push the input tiles so only the outer tiles need to update
 				for y in range(INPUT_GRID_SIZE):
 					for x in range(1,INPUT_GRID_SIZE):
 						self.input_tiles[y][x-1] = self.input_tiles[y][x]
+				#Update the outer tiles
 				for y in range(INPUT_GRID_SIZE):
 					point  = (player_x+(self.tile_step)*64, player_y-(y-self.tile_step)*64)
 					self.input_tiles[y][INPUT_GRID_SIZE-1] = self.get_tile_sort(point)
 			
+			#If the player has moved to the left
 			elif (self.last_position_x > player_x):
 				for y in range(INPUT_GRID_SIZE):
 					for x in range(INPUT_GRID_SIZE-2, -1, -1):
@@ -241,15 +246,15 @@ class Game(arcade.Window):
 					point  = (player_x-(self.tile_step)*64, player_y-(y-self.tile_step)*64)
 					self.input_tiles[y][0] = self.get_tile_sort(point)
 			
-			
-			elif (self.last_position_y < player_y):
-				
+			#IF the player has gone down
+			elif (self.last_position_y < player_y):				
 				for x in range(INPUT_GRID_SIZE):
 					for y in range(INPUT_GRID_SIZE-2, -1, -1):
 						self.input_tiles[y+1][x] = self.input_tiles[y][x]
 				for x in range(INPUT_GRID_SIZE):
 					point  = (player_x-(x-self.tile_step)*64, player_y+(self.tile_step)*64)
 					self.input_tiles[0][x] = self.get_tile_sort(point)
+			#If the player has gone up
 			elif (self.last_position_y > player_y):		
 				for x in range(INPUT_GRID_SIZE):
 					for y in range(INPUT_GRID_SIZE-1):
@@ -259,6 +264,7 @@ class Game(arcade.Window):
 					self.input_tiles[INPUT_GRID_SIZE-1][x] = self.get_tile_sort(point)
 				
 			#self.print_input_tile()
+		
 		#Update last postion
 		self.last_position_x = player_x
 		self.last_position_y = player_y
@@ -304,7 +310,7 @@ class Game(arcade.Window):
 				self.speed_x = -PLAYER_MOVEMENT_SPEED
 		
 		#Left button released deaccerelation
-		elif self.speed_x < 0 and not self.right_button_pressed:
+		elif self.speed_x < 0:
 			self.speed_x += ACCELERATION * delta_time
 			
 			#Check for min speed
@@ -320,7 +326,7 @@ class Game(arcade.Window):
 				self.speed_x = PLAYER_MOVEMENT_SPEED
 		
 		#Right button released and deaccerelation
-		elif self.speed_x > 0 and not self.left_button_pressed:
+		elif self.speed_x > 0:
 			self.speed_x -= ACCELERATION * delta_time
 			
 			#Check for min speed
@@ -335,7 +341,8 @@ class Game(arcade.Window):
 	def update_score(self):
 	 	new_score =int((self.player.center_x-START_POSITION_X) / 64)
 	 	
-	 	#Make sure that the score does not decrease if going backwards
+	 	#Make sure that the score does not decrease if going backwards and count the 
+	 	#frames that the AI does not move
 	 	if new_score>self.score_distance:
 	 		self.score_distance = new_score
 	 		self.counter = 0
@@ -345,6 +352,7 @@ class Game(arcade.Window):
 
 	#Managing the scrolling of the screen
 	def scrolling(self):
+		
 		# Track if we need to change the viewport
 		changed = False
 
@@ -386,6 +394,7 @@ class Game(arcade.Window):
 	def update(self, delta_time):
 		#Variable definition
 		should_end = False
+		#Create a 
 		inputs = list(())
 		self.get_input_tiles()
 		for y in range(INPUT_GRID_SIZE):
@@ -393,15 +402,16 @@ class Game(arcade.Window):
 				inputs.append(self.input_tiles[y][x])
 	
 		
+		#Calculate the outputs.
 		nnOutput = self.net.activate(inputs)
-		#print(nnOutput)
+
 		nnOutput[0] = round(nnOutput[0])
 		nnOutput[1] = round(nnOutput[1])
 		nnOutput[2] = round(nnOutput[2])
 		print(nnOutput)
-		self.left_button_pressed = nnOutput[0]
-		self.jump_button_pressed = nnOutput[1]
-		self.right_button_pressed = nnOutput[2]
+		#self.left_button_pressed = nnOutput[0]
+		#self.jump_button_pressed = nnOutput[1]
+		#self.right_button_pressed = nnOutput[2]
 		#Update the movement on the player
 		self.update_movement(delta_time)
 
