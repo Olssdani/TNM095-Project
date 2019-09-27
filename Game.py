@@ -6,6 +6,7 @@ from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
 from arcade.arcade_types import Point
 import gc
+import pdb
 
 #Scaling of sprites
 TILE_SCALING = 0.5
@@ -26,6 +27,8 @@ BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 START_POSITION_X = 200
 INPUT_GRID_SIZE = 7 #Keep uneven!!!
+#Max number of generations
+n = 300
 
 
 class Game(arcade.Window):
@@ -73,6 +76,8 @@ class Game(arcade.Window):
 		self.tile_step = INPUT_GRID_SIZE//2
 		self.net = None
 		self.counter = 0
+		self.generation_counter = 1
+		self.genome_id = 0
 
 		
 	def setup_neat(self, config_file): 
@@ -80,14 +85,64 @@ class Game(arcade.Window):
 
 		self.p = neat.Population(self.config_neat)	
 
-		self.genomes = list(iteritems(self. p.population))
+		self.genomes = list(iteritems(self.p.population))
 
 		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
 
 	#TODO Implement the code to evolve the genomes
 	def evolve_genomes(self):
-		print("Evovle")
+		print("Evolve from generation " + str(self.p.generation))
+		if self.p.config.no_fitness_termination and (n is None):
+			raise RuntimeError("Cannot have no generational limit with no fitness termination")
+
+		# Gather and report statistics.
+		best = None
+		for g in itervalues(self.p.population):
+			#print(g)
+			if best is None or g.fitness > best.fitness:
+				best = g
+		#print(self.p.species)
+		self.p.reporters.post_evaluate(self.p.config, self.p.population, self.p.species, best)
+
+		# Track the best genome ever seen.
+		if self.p.best_genome is None or best.fitness > self.p.best_genome.fitness:
+			self.p.best_genome = best
+
+		if not self.p.config.no_fitness_termination:
+			# End if the fitness threshold is reached.
+			fv = self.p.fitness_criterion(g.fitness for g in itervalues(self.p.population))
+			if fv >= self.p.config.fitness_threshold:
+				self.p.reporters.found_solution(self.p.config, self.p.generation, best)
+				#TODO SOMETHING WHEN THRESHOLD HAS BEEN FOUND
+				print("found best")
+				arcade.close_window()
+				#break
+
+			# Create the next generation from the current generation.
+		
+		self.p.population = self.p.reproduction.reproduce(self.p.config, self.p.species, self.p.config.pop_size, self.p.generation)
+		print("Species")
+		print(self.p.species.species)
+
+		# Check for complete extinction.
+		if not self.p.species.species:
+
+			self.p.reporters.complete_extinction()
+
+			# If requested by the user, create a completely new population,
+			# otherwise raise an exception.
+			if self.p.config.reset_on_extinction:
+				self.p.population = self.p.reproduction.create_new(self.p.config.genome_type, self.p.config.genome_config, self.p.config.pop_size)
+			else:
+				raise CompleteExtinctionException()
+
+		# Divide the new population into species.
+		self.p.species.speciate(self.p.config, self.p.population, self.p.generation)
+
+		self.p.reporters.end_generation(self.p.config, self.p.population, self.p.species)
+
+		self.p.generation += 1
 		
 
 	#Game setup, Initliaze and load variables.
@@ -146,12 +201,18 @@ class Game(arcade.Window):
 		#Neat
 		if(self.current_genome_index > len(self.genomes) - 1):
 			self.evolve_genomes()
+
+			self.genomes = list(iteritems(self.p.population))
+			print("lenght of genomes" + str(len(self.genomes)))
+			#print("lenght of species" + str(len(self.p.species)))
+			self.p.reporters.start_generation(self.p.generation)
 			self.current_genome_index = 0
 
 		self.current_genome = self.genomes[self.current_genome_index][1]
+		self.genome_id = self.genomes[self.current_genome_index][0]
 
 		self.net = neat.nn.recurrent.RecurrentNetwork.create(self.current_genome, self.config_neat)
-
+		#print("On genome number: " + str(self.current_genome_index))
 	#Draw all sprites during rendering
 	def on_draw(self):
 		#Start the rendering
@@ -408,10 +469,10 @@ class Game(arcade.Window):
 		nnOutput[0] = round(nnOutput[0])
 		nnOutput[1] = round(nnOutput[1])
 		nnOutput[2] = round(nnOutput[2])
-		print(nnOutput)
-		#self.left_button_pressed = nnOutput[0]
-		#self.jump_button_pressed = nnOutput[1]
-		#self.right_button_pressed = nnOutput[2]
+		#print(nnOutput)
+		self.left_button_pressed = nnOutput[0]
+		self.jump_button_pressed = nnOutput[1]
+		self.right_button_pressed = nnOutput[2]
 		#Update the movement on the player
 		self.update_movement(delta_time)
 
@@ -444,15 +505,17 @@ class Game(arcade.Window):
 		self.scrolling()
 		self.update_score()
 
-		if self.counter > 200:
+		if self.counter > 80:
 			self.counter = 0
 			should_end = True
 		if should_end:
 			self.genomes[self.current_genome_index][1].fitness = self.score_distance
+			#print(self.genomes[self.current_genome_index][1].fitness)
+			print("On genome id: " + str(self.genome_id) + " with fitness: " + str(self.genomes[self.current_genome_index][1].fitness))
 			self.current_genome_index +=1
-			print("On genome number: " + str(self.current_genome_index))
-			self.setup()
 			
+			self.setup()
+		
 
 
 	def run(self):
