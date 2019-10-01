@@ -26,12 +26,12 @@
  </tileset>
  <layer id="1" name="Plattform" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt1tsKwyAMgGEvSn3/Nx67EILEQxJtS/t/ILRsanSJLiUAAAAAAAAAAAAAAPY77g7g4w7RgB3+uZXvDqIhN57fRO5/TtR61KG0rys5Fq2hXfv61DpftU7tjF1d61reX5n/9VzWueu+o+/u3k+Pes2naKl61j6Pzi3vEY8SR6seo/FeUeeenF91NrbGiORmXct3no+t+WfXV/fv9du1n1Gr7tLI3IUlBq0uLGOdab7+td+4dSf17q1ey52xI31GcY32ybteTz5Z1jF6n41lZs97Z4RnPyVrnsh+1jFW1bkntyUtBkvMK+7d0f4+6X878AXyTC3vSXkGgFk/gBsFDg==
+   eJzt1tEOgyAMQNE+GPn/P172QEKaFqiFaeY9iYlOgcJoVQQAAAAAAAAAAAAAgP2OuwN4uaM5gB2+e6vcHYSjOOf/pF3/IuR61mEcb1f3WDaHdq3rU/N81TytGrs61619/8v9r8eKjq3bjp7dvZ5X6DmfzSHq3LqfHbt9j1xR4/DyMRtvNs937edVtdHrI7M3dS7fWR+98Wfnp9v32u1az6xV79LM2FUkBit3In2dMp//1n/svZOse8VoZz3v9eH9bvU7E5uoPkZzj8y3bRcVnUPverbGzKxfr0ZE65m+Pxq7tw7RPlbleTRm69tmtk8r5hXf16P1fdJ3O/AGbU2t12KcA8CsD/HVBOo=
   </data>
  </layer>
  <layer id="5" name="Background" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt1NEKgCAMQFEfAv//j3sxCEvT3Ka4e0AoqM3NVggAAAAAAAAAAAAAvhxpAdjPNd8xLQB78jLjHmoESjzMeQw+6rRCP5+keqHV193PK74sixyWPY2Fa61cs+pclWQfmPN+pfkbrbcW1/r7z3P15u75R8yudUXSPbCY89r5tX7bVktrX5JxW2Llz3zda+xbquYwEOv+3miMvyTPvCVmbQ8aNWjQjN1jhT0AKzgBc28HVw==
+   eJzt1EkOgCAMQFEWJtz/xm5wo0y1tBD4LyHRBXSQGgIAAAAAAAAAAACAlistAPt55jumBWBPp8z4CTUCJSfMeQxn1OmFfn6N6oVVX3f/XjGzPGJ49jQWnq1izapzVSP7wJzLleZPW2/tXO/7/44ljS35R8yudUWje+Ax57XvJ73bPWdIz27t15xlkWvPnlwNtXdNLIu9pXuuyUF7xl/a+nM5SPPV1mLZn1q82VbIAVjBDa0xBxg=
   </data>
  </layer>
  <layer id="2" name="Death" width="250" height="15">

@@ -1,3 +1,4 @@
+#Imports
 import arcade
 from datetime import time
 import neat
@@ -6,7 +7,6 @@ from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
 from arcade.arcade_types import Point
 import gc
-import pdb
 
 #Scaling of sprites
 TILE_SCALING = 0.5
@@ -26,6 +26,8 @@ RIGHT_VIEWPORT_MARGIN = 300
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 START_POSITION_X = 200
+
+
 INPUT_GRID_SIZE = 7 #Keep uneven!!!
 #Max number of generations
 n = 300
@@ -63,6 +65,7 @@ class Game(arcade.Window):
 		#Game specific variables
 		self.game_over = False
 		self.score_distance = 0
+		self.score_minus = 0
 
 		#Neat
 		self.config_neat = None
@@ -122,8 +125,6 @@ class Game(arcade.Window):
 			# Create the next generation from the current generation.
 		
 		self.p.population = self.p.reproduction.reproduce(self.p.config, self.p.species, self.p.config.pop_size, self.p.generation)
-		print("Species")
-		print(self.p.species.species)
 
 		# Check for complete extinction.
 		if not self.p.species.species:
@@ -162,6 +163,7 @@ class Game(arcade.Window):
 		self.player_list.append(self.player)
 		self.score_distance = 0
 		self.speed_x = 0
+		self.score_minus = 0
 
 		# --- Load in a map from the tiled editor ---
 		# Name of map file to load
@@ -203,8 +205,6 @@ class Game(arcade.Window):
 			self.evolve_genomes()
 
 			self.genomes = list(iteritems(self.p.population))
-			print("lenght of genomes" + str(len(self.genomes)))
-			#print("lenght of species" + str(len(self.p.species)))
 			self.p.reporters.start_generation(self.p.generation)
 			self.current_genome_index = 0
 
@@ -212,7 +212,7 @@ class Game(arcade.Window):
 		self.genome_id = self.genomes[self.current_genome_index][0]
 
 		self.net = neat.nn.recurrent.RecurrentNetwork.create(self.current_genome, self.config_neat)
-		#print("On genome number: " + str(self.current_genome_index))
+		
 	#Draw all sprites during rendering
 	def on_draw(self):
 		#Start the rendering
@@ -228,7 +228,7 @@ class Game(arcade.Window):
 		
 
 		# Draw our score on the screen, scrolling it with the viewport
-		score_text = f"Score: {self.score_distance}"
+		score_text = f"Score: {self.score_distance-self.score_minus}"
 		arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
 
@@ -361,6 +361,7 @@ class Game(arcade.Window):
 		if self.jump_button_pressed:
 			if self.physics_engine.can_jump():
 				self.player.change_y = PLAYER_JUMP_SPEED
+				self.score_minus += 1
 
 		#Left button pressed accerelation
 		if self.left_button_pressed and not self.right_button_pressed:
@@ -410,6 +411,10 @@ class Game(arcade.Window):
 	 	else:
 	 		self.counter +=1 
 		
+		
+	def add_to_score(self, points):
+		self.score_distance += points
+
 
 	#Managing the scrolling of the screen
 	def scrolling(self):
@@ -509,8 +514,7 @@ class Game(arcade.Window):
 			self.counter = 0
 			should_end = True
 		if should_end:
-			self.genomes[self.current_genome_index][1].fitness = self.score_distance
-			#print(self.genomes[self.current_genome_index][1].fitness)
+			self.genomes[self.current_genome_index][1].fitness = self.score_distance -self.score_minus
 			print("On genome id: " + str(self.genome_id) + " with fitness: " + str(self.genomes[self.current_genome_index][1].fitness))
 			self.current_genome_index +=1
 			
