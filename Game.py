@@ -93,7 +93,7 @@ class Game(arcade.Window):
 		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
 
-	#TODO Implement the code to evolve the genomes
+	#evolve gnomes
 	def evolve_genomes(self):
 		print("Evolve from generation " + str(self.p.generation))
 		if self.p.config.no_fitness_termination and (n is None):
