@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#9b9bc8" nextlayerid="5" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#9b9bc8" nextlayerid="6" nextobjectid="1">
  <tileset firstgid="1" name="My Tiles" tilewidth="128" tileheight="128" tilecount="7" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -71,20 +71,25 @@
  </tileset>
  <layer id="1" name="Plattform" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt2NEKwyAMheFA0WHZ+z/vECxkxWqsYRvu/+DcrJ066ElhIgAAAAAAAAAAYFYoAbCurQS/JX77AFiKR8+fKhDZS2Ywe+FJ9/yf+vpQ8ZT7nUpmuk7P4Wnmfd6aB3sjnxZV7rKcW3e81XXLWvQcnkZ7bu3p+XnXuRKk/7/g6JzI3d7k/jw7ZkPr3Fmt47Wu75XPaug5PB3Pf+jkkAz3Bnnv1jmW78zuf3UOUddiJ1rq3Nuaa+m0TjKsR8/hqdXH2nvQer93vPa/85u99h1dB8Da6Dk8vQCcAQWA
+   eJzt1uEKgyAYhWFBauTu/35HoHD4Zml+bgS9D5w/m80VnjQEAAAAAAAAAADgteTg3lIOMCLm4N62HGAEPZ/vF3svPYfHU3v+ksy097t0cmbX6Tk8ntDzVeLRei9ox690PYX2GYCew2NGz2tr9MrZtXfsyHl473YM4/fZu+drx3W+nq7re6E1BhhR1uNykF1tv0kypqxBva78bqrEzqF7n47RudLBPK1Ek7d8tzbSomNrHY/h+z/rPdprN/nMPjN6Dg+7Lm3smN7rZuSfc53NP/rsPLHnf3oOADjzAdvEBdo=
+  </data>
+ </layer>
+ <layer id="5" name="Background" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJzt00sKwCAMQEGhq9z/wt0HQaRKIZmBLP2BbwwAAAAAAABgJf6+AHCdzqE+nUN9Oof6unQeo89bIav+9yMNdJQ7mHUx62S17sTcOOvZmJVT+wDAVy8n/QKb
   </data>
  </layer>
  <layer id="4" name="Enemy" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJztzcEJAAAIAzF3cP9dXUIRNHlfaQQAAAAAAAAAAAAA/JPDfde2w/Y/AAAAdxSpfABN
+   eJztzTERAAAIAzE84N8rEpg4OiT7t1UAAAAAAAAAAAAAwKaf2oud9E8AAAByDZesAE0=
   </data>
  </layer>
  <layer id="3" name="End" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJztzjEBAAAIA6BVsH9ZM+zRBxKQAAAAAAAAAAAAAAD05jsAAADAuQUpcwAS
+   eJztzjENAAAIA7BZwL9ZRCyEp1XQBAAAAAAAAAAAAACgN98BAAAAzi0oYwAS
   </data>
  </layer>
- <layer id="2" name="Death" width="250" height="15">
+ <layer id="2" name="Death" width="250" height="15" visible="0">
   <data encoding="base64" compression="zlib">
    eJztw7ENAAAIA6CO/n+xR9TBARISAAAAAAAAAAAAAAAAAOiNL8OlBSrOAzE=
   </data>
