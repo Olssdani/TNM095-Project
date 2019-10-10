@@ -90,22 +90,26 @@ class Game(arcade.Window):
 
 		self.genomes = list(iteritems(self.p.population))
 
+		 # Add a stdout reporter to show progress in the terminal.
+		self.p.add_reporter(neat.StdOutReporter(True))
+		stats = neat.StatisticsReporter()
+		self.p.add_reporter(stats)
+		self.p.add_reporter(neat.Checkpointer(10))
+		if self.p.config.no_fitness_termination and (n is None):
+			raise RuntimeError("Cannot have no generational limit with no fitness termination")
+
 		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
 
 	#evolve gnomes
 	def evolve_genomes(self):
-		print("Evolve from generation " + str(self.p.generation))
-		if self.p.config.no_fitness_termination and (n is None):
-			raise RuntimeError("Cannot have no generational limit with no fitness termination")
 
 		# Gather and report statistics.
 		best = None
 		for g in itervalues(self.p.population):
-			#print(g)
 			if best is None or g.fitness > best.fitness:
 				best = g
-		#print(self.p.species)
+	
 		self.p.reporters.post_evaluate(self.p.config, self.p.population, self.p.species, best)
 
 		# Track the best genome ever seen.
@@ -118,7 +122,6 @@ class Game(arcade.Window):
 			if fv >= self.p.config.fitness_threshold:
 				self.p.reporters.found_solution(self.p.config, self.p.generation, best)
 				#TODO SOMETHING WHEN THRESHOLD HAS BEEN FOUND
-				print("found best")
 				arcade.close_window()
 				#break
 
@@ -167,7 +170,7 @@ class Game(arcade.Window):
 
 		# --- Load in a map from the tiled editor ---
 		# Name of map file to load
-		map_name = "Easy.tmx"
+		map_name = "Level1.tmx"
 		
 		# Names of the layers
 		platforms_layer_name = 'Plattform'
@@ -205,9 +208,15 @@ class Game(arcade.Window):
 			self.evolve_genomes()
 
 			self.genomes = list(iteritems(self.p.population))
-			self.p.reporters.start_generation(self.p.generation)
-			self.current_genome_index = 0
 
+			self.current_genome_index = 0
+			
+			
+			#print("On generation " + str(self.p.generation))
+			#print("Number of ")
+
+		if(self.current_genome_index == 0):
+			self.p.reporters.start_generation(self.p.generation)
 		self.current_genome = self.genomes[self.current_genome_index][1]
 		self.genome_id = self.genomes[self.current_genome_index][0]
 
@@ -361,7 +370,7 @@ class Game(arcade.Window):
 		if self.jump_button_pressed:
 			if self.physics_engine.can_jump():
 				self.player.change_y = PLAYER_JUMP_SPEED
-				self.score_minus += 1
+				#self.score_minus += 1
 
 		#Left button pressed accerelation
 		if self.left_button_pressed and not self.right_button_pressed:
@@ -510,7 +519,7 @@ class Game(arcade.Window):
 		self.scrolling()
 		self.update_score()
 
-		if self.counter > 80:
+		if self.counter > 120:
 			self.counter = 0
 			should_end = True
 		if should_end:

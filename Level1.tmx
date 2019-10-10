@@ -62,16 +62,15 @@
   <tile id="10">
    <image width="64" height="64" source="Enemy.png"/>
    <objectgroup draworder="index">
-    <object id="1" x="0" y="0" width="64" height="64"/>
-    <object id="3" x="0" y="0">
-     <polyline points="0,0 0,64 64,64 64,0 0,0"/>
+    <object id="5" x="0" y="0">
+     <polygon points="0,0 0,64 64,64 64,0"/>
     </object>
    </objectgroup>
   </tile>
  </tileset>
  <layer id="1" name="Plattform" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt1uEKgyAYhWFBauTu/35HoHD4Zml+bgS9D5w/m80VnjQEAAAAAAAAAADgteTg3lIOMCLm4N62HGAEPZ/vF3svPYfHU3v+ksy097t0cmbX6Tk8ntDzVeLRei9ox690PYX2GYCew2NGz2tr9MrZtXfsyHl473YM4/fZu+drx3W+nq7re6E1BhhR1uNykF1tv0kypqxBva78bqrEzqF7n47RudLBPK1Ek7d8tzbSomNrHY/h+z/rPdprN/nMPjN6Dg+7Lm3smN7rZuSfc53NP/rsPLHnf3oOADjzAdvEBdo=
+   eJzt1u0KwjAQRNFAaKXx/d9XCgkMa/NhNkrBe2D+aMLakrENAQAAAAAAAAAAeG05uLeUA8yIObi3IweYQc/X+8azl57Dg56vdfa7dHJl1+k5PP6h57vE45FTox3/pOsp9N8B6Dk8VvTc+546un9mztntGOavs9ftQjuu80a6rv8LvTXAjHIet0pOV8+bJGvKGdR9qRE7Q599ukZnpcqcXqLJU77bO+nRtVcdj+H9N+s12r2HfGbvGT2Hhz2XNnbN6L4V+eWs1vzZe+eJff+n5wCAlhdxzgW/
   </data>
  </layer>
  <layer id="5" name="Background" width="250" height="15">
