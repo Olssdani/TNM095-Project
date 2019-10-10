@@ -94,7 +94,7 @@ class Game(arcade.Window):
 		self.p.add_reporter(neat.StdOutReporter(True))
 		stats = neat.StatisticsReporter()
 		self.p.add_reporter(stats)
-		self.p.add_reporter(neat.Checkpointer(10))
+		self.p.add_reporter(neat.Checkpointer(20))
 		if self.p.config.no_fitness_termination and (n is None):
 			raise RuntimeError("Cannot have no generational limit with no fitness termination")
 
