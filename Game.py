@@ -7,6 +7,8 @@ from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
 from arcade.arcade_types import Point
 import gc
+import os
+import sys
 
 #Scaling of sprites
 TILE_SCALING = 0.5
@@ -121,9 +123,8 @@ class Game(arcade.Window):
 			fv = self.p.fitness_criterion(g.fitness for g in itervalues(self.p.population))
 			if fv >= self.p.config.fitness_threshold:
 				self.p.reporters.found_solution(self.p.config, self.p.generation, best)
-				#TODO SOMETHING WHEN THRESHOLD HAS BEEN FOUND
 				arcade.close_window()
-				#break
+				
 
 			# Create the next generation from the current generation.
 		
@@ -210,10 +211,6 @@ class Game(arcade.Window):
 			self.genomes = list(iteritems(self.p.population))
 
 			self.current_genome_index = 0
-			
-			
-			#print("On generation " + str(self.p.generation))
-			#print("Number of ")
 
 		if(self.current_genome_index == 0):
 			self.p.reporters.start_generation(self.p.generation)
@@ -339,6 +336,16 @@ class Game(arcade.Window):
 		self.last_position_x = player_x
 		self.last_position_y = player_y
 	
+	def start_from_file(self, filename):
+		print("before")
+		print(self.p)
+		self.p = neat.Checkpointer.restore_checkpoint(filename)
+		print("After")
+		print(self.p)
+		self.current_genome_index = 0
+		self.current_genome = None
+		self.setup()
+
 
 	#Oncall method on key press, sets specific variable to true and the movement is handle elsewhere
 	def on_key_press(self, key, modifiers):
@@ -352,6 +359,13 @@ class Game(arcade.Window):
 			self.right_button_pressed = True
 			self.player.change_x = PLAYER_MOVEMENT_SPEED
 
+		if key == arcade.key.R:
+			input_generation_number = input()
+			file_path =os.path.join(os.path.dirname(__file__), 'neat-checkpoint-'+str(input_generation_number))
+			print(file_path)
+			self.start_from_file(file_path) 
+
+
 
 	#Oncall method for key realese, change the specific variable
 	def on_key_release(self, key, modifiers):
@@ -362,6 +376,7 @@ class Game(arcade.Window):
 			self.left_button_pressed = False
 		elif key == arcade.key.RIGHT or key == arcade.key.D:
 			self.right_button_pressed = False
+
 
 
 	#Function to update movement speed to include accerelation and deaccerelation

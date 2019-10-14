@@ -10,11 +10,11 @@ def main():
 
 	#Path to NEAT config file
 	local_dir = os.path.dirname(__file__)
-	config_path = os.path.join(local_dir, 'config')
+	config_path = os.path.join(os.path.dirname(__file__), 'config')
 
 	#Initalize and start game
 	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-	game.setup_neat("D:\Programmering\TNM095-Project\config")
+	game.setup_neat(config_path)
 	game.setup()
 	game.run()
 
