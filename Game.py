@@ -9,7 +9,9 @@ from arcade.arcade_types import Point
 import gc
 import os
 import sys
+import pickle
 
+#define = *=
 #Scaling of sprites
 TILE_SCALING = 0.5
 CHARACTER_SCALING = 0.4
@@ -84,31 +86,37 @@ class Game(arcade.Window):
 		self.counter = 0
 		self.generation_counter = 1
 		self.genome_id = 0
+		self.type_of_run = None
 
 	def start_from_file(self, filename):
 		self.p = neat.Checkpointer.restore_checkpoint(filename)
 		
 	def setup_neat(self, config_file, run_setup): 
 		self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
-		
+		self.type_of_run = run_setup
 		if(run_setup == "n"):
 			self.p = neat.Population(self.config_neat)	
-		elif (run_setup == "o"):
+		elif (run_setup == "c"):
 			print("Type generation number that should be load")
 			input_generation_number = input()
 			file_path ='neat-checkpoint-'+str(input_generation_number)
-			print(file_path)
 			self.start_from_file(file_path) 
+		
 
-		self.genomes = list(iteritems(self.p.population))
 
-		 # Add a stdout reporter to show progress in the terminal.
-		self.p.add_reporter(neat.StdOutReporter(True))
-		stats = neat.StatisticsReporter()
-		self.p.add_reporter(stats)
-		self.p.add_reporter(neat.Checkpointer(2))
-		if self.p.config.no_fitness_termination and (n is None):
-			raise RuntimeError("Cannot have no generational limit with no fitness termination")
+			self.genomes = list(iteritems(self.p.population))
+
+		
+			# Add a stdout reporter to show progress in the terminal.
+			self.p.add_reporter(neat.StdOutReporter(True))
+			stats = neat.StatisticsReporter()
+			self.p.add_reporter(stats)
+			self.p.add_reporter(neat.Checkpointer(2))
+			if self.p.config.no_fitness_termination and (n is None):
+				raise RuntimeError("Cannot have no generational limit with no fitness termination")
+		elif (self.type_of_run == "b"):
+			self.current_genome = pickle.load(open( "winner.p", "rb" ))
+
 
 		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
@@ -133,6 +141,7 @@ class Game(arcade.Window):
 			fv = self.p.fitness_criterion(g.fitness for g in itervalues(self.p.population))
 			if fv >= self.p.config.fitness_threshold:
 				self.p.reporters.found_solution(self.p.config, self.p.generation, best)
+				pickle.dump(self.p.best_genome, open( "winner.p", "wb" ) )
 				arcade.close_window()
 				
 
@@ -215,17 +224,18 @@ class Game(arcade.Window):
 		self.view_left = 0
 
 		#Neat
-		if(self.current_genome_index > len(self.genomes) - 1):
+		if(self.type_of_run != "b" and self.current_genome_index > len(self.genomes) - 1):
 			self.evolve_genomes()
 
 			self.genomes = list(iteritems(self.p.population))
 
 			self.current_genome_index = 0
 
-		if(self.current_genome_index == 0):
+		if(self.current_genome_index == 0 and self.type_of_run != "b"):
 			self.p.reporters.start_generation(self.p.generation)
-		self.current_genome = self.genomes[self.current_genome_index][1]
-		self.genome_id = self.genomes[self.current_genome_index][0]
+		if(self.type_of_run != "b"):
+			self.current_genome = self.genomes[self.current_genome_index][1]
+			self.genome_id = self.genomes[self.current_genome_index][0]
 
 		self.net = neat.nn.recurrent.RecurrentNetwork.create(self.current_genome, self.config_neat)
 		
@@ -491,15 +501,14 @@ class Game(arcade.Window):
 	def update(self, delta_time):
 		#Variable definition
 		should_end = False
-		
+
 		#Create a list of the input matrix
 		inputs = list(())
 		self.get_input_tiles()
 		for y in range(INPUT_GRID_SIZE):
 			for x in range(INPUT_GRID_SIZE):
 				inputs.append(self.input_tiles[y][x])
-
-		
+	
 		#Calculate the outputs.
 		nnOutput = self.net.activate(inputs)
 
@@ -548,10 +557,10 @@ class Game(arcade.Window):
 			self.counter = 0
 			should_end = True
 		if should_end:
-			self.genomes[self.current_genome_index][1].fitness = self.score_distance -self.score_minus
-			print("On genome id: " + str(self.genome_id) + " with fitness: " + str(self.genomes[self.current_genome_index][1].fitness))
-			self.current_genome_index +=1
-			
+			if(self.type_of_run != "b"):
+				self.genomes[self.current_genome_index][1].fitness = self.score_distance -self.score_minus
+				print("On genome id: " + str(self.genome_id) + " with fitness: " + str(self.genomes[self.current_genome_index][1].fitness))
+				self.current_genome_index +=1
 			self.setup()
 		
 

@@ -13,9 +13,9 @@ def main():
 	config_path = os.path.join(os.path.dirname(__file__), 'config')
 
 	#Initalize and start game
-	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-	print("New run or load in a old run? (n/o)")
+	print("To run new run type 'n', to continue on a saved run type 'c' and to run best genome from one saved run type 'b'")
 	choice_of_run = input();
+	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 	game.setup_neat(config_path,choice_of_run )
 	game.setup()
 	game.run()
