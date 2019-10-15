@@ -44,7 +44,7 @@ class Game(arcade.Window):
 		
 		#Initalize parent object with is the arcade.window
 		super().__init__(width, height, title, resizable=True)
-		
+		print(Type.Plattform)
 		'''
 		Initlization of member variables
 		'''
