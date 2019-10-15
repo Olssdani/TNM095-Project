@@ -30,7 +30,8 @@ TOP_VIEWPORT_MARGIN = 100
 START_POSITION_X = 200
 
 
-INPUT_GRID_SIZE = 7 #Keep uneven!!!
+INPUT_GRID_SIZE = 9 #Keep uneven!!!
+NO_IMPROVMENT_KILL = 150
 #Max number of generations
 n = 300
 
@@ -84,11 +85,20 @@ class Game(arcade.Window):
 		self.generation_counter = 1
 		self.genome_id = 0
 
+	def start_from_file(self, filename):
+		self.p = neat.Checkpointer.restore_checkpoint(filename)
 		
-	def setup_neat(self, config_file): 
+	def setup_neat(self, config_file, run_setup): 
 		self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
-
-		self.p = neat.Population(self.config_neat)	
+		
+		if(run_setup == "n"):
+			self.p = neat.Population(self.config_neat)	
+		elif (run_setup == "o"):
+			print("Type generation number that should be load")
+			input_generation_number = input()
+			file_path ='neat-checkpoint-'+str(input_generation_number)
+			print(file_path)
+			self.start_from_file(file_path) 
 
 		self.genomes = list(iteritems(self.p.population))
 
@@ -96,7 +106,7 @@ class Game(arcade.Window):
 		self.p.add_reporter(neat.StdOutReporter(True))
 		stats = neat.StatisticsReporter()
 		self.p.add_reporter(stats)
-		self.p.add_reporter(neat.Checkpointer(20))
+		self.p.add_reporter(neat.Checkpointer(2))
 		if self.p.config.no_fitness_termination and (n is None):
 			raise RuntimeError("Cannot have no generational limit with no fitness termination")
 
@@ -266,8 +276,8 @@ class Game(arcade.Window):
 		if len(arcade.get_sprites_at_point(point, self.plattform_list)) > 0:
 			return 1
 		#Enemy
-		elif len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0:
-			return -1
+		#elif len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0:
+		#	return -1
 		#Rest
 		else:
 			return 0
@@ -282,6 +292,13 @@ class Game(arcade.Window):
 		player_x = (self.player.center_x // 64 ) * 64 + 32
 		player_y = (self.player.center_y // 64 ) * 64 + 32
 		
+		for y in range(INPUT_GRID_SIZE):
+			for x in range(INPUT_GRID_SIZE):
+				point  = (player_x+(x-self.tile_step)*64, player_y-(y-self.tile_step)*64)
+				if(len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0):
+					self.input_tiles[y][x] = -1
+				elif(self.input_tiles[y][x] < 0):
+					self.input_tiles[y][x] = 0
 		#Check if player have moved into another tile otherwise do not update the input tiles
 		if(self.last_position_y !=player_y or self.last_position_x != player_x):
 			
@@ -330,21 +347,15 @@ class Game(arcade.Window):
 					point  = (player_x + (x - self.tile_step) * 64, player_y - self.tile_step * 64)
 					self.input_tiles[INPUT_GRID_SIZE-1][x] = self.get_tile_sort(point)
 				
-			#self.print_input_tile()
+		#self.print_input_tile()
 		
+
+
 		#Update last postion
 		self.last_position_x = player_x
 		self.last_position_y = player_y
 	
-	def start_from_file(self, filename):
-		print("before")
-		print(self.p)
-		self.p = neat.Checkpointer.restore_checkpoint(filename)
-		print("After")
-		print(self.p)
-		self.current_genome_index = 0
-		self.current_genome = None
-		self.setup()
+
 
 
 	#Oncall method on key press, sets specific variable to true and the movement is handle elsewhere
@@ -359,11 +370,7 @@ class Game(arcade.Window):
 			self.right_button_pressed = True
 			self.player.change_x = PLAYER_MOVEMENT_SPEED
 
-		if key == arcade.key.R:
-			input_generation_number = input()
-			file_path =os.path.join(os.path.dirname(__file__), 'neat-checkpoint-'+str(input_generation_number))
-			print(file_path)
-			self.start_from_file(file_path) 
+
 
 
 
@@ -484,13 +491,14 @@ class Game(arcade.Window):
 	def update(self, delta_time):
 		#Variable definition
 		should_end = False
-		#Create a 
+		
+		#Create a list of the input matrix
 		inputs = list(())
 		self.get_input_tiles()
 		for y in range(INPUT_GRID_SIZE):
 			for x in range(INPUT_GRID_SIZE):
 				inputs.append(self.input_tiles[y][x])
-	
+
 		
 		#Calculate the outputs.
 		nnOutput = self.net.activate(inputs)
@@ -502,6 +510,7 @@ class Game(arcade.Window):
 		self.left_button_pressed = nnOutput[0]
 		self.jump_button_pressed = nnOutput[1]
 		self.right_button_pressed = nnOutput[2]
+		
 		#Update the movement on the player
 		self.update_movement(delta_time)
 
@@ -529,12 +538,13 @@ class Game(arcade.Window):
 			if arcade.check_for_collision_with_list(self.player, self.death_list):
 				should_end = True
 			if arcade.check_for_collision_with_list(self.player, self.end_list):
+				self.score_distance +=1000
 				should_end = True
 
 		self.scrolling()
 		self.update_score()
 
-		if self.counter > 120:
+		if self.counter > NO_IMPROVMENT_KILL:
 			self.counter = 0
 			should_end = True
 		if should_end:

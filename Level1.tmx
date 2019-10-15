@@ -24,7 +24,7 @@
    <image width="128" height="128" source="lava2.png"/>
   </tile>
  </tileset>
- <tileset firstgid="9" name="My tiles" tilewidth="128" tileheight="128" tilecount="9" columns="0">
+ <tileset firstgid="9" name="My tiles" tilewidth="128" tileheight="128" tilecount="12" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
    <image width="128" height="128" source="ground05.png"/>
@@ -67,20 +67,39 @@
     </object>
    </objectgroup>
   </tile>
+  <tile id="11">
+   <image width="128" height="128" source="Large.png"/>
+   <objectgroup draworder="index">
+    <object id="1" x="0" y="0">
+     <polygon points="0,0 0,128 128,128 128,0"/>
+    </object>
+   </objectgroup>
+  </tile>
+  <tile id="12">
+   <image width="64" height="64" source="small.png"/>
+  </tile>
+  <tile id="13">
+   <image width="128" height="128" source="Middle.png"/>
+   <objectgroup draworder="index">
+    <object id="2" x="-3" y="17">
+     <polygon points="0,0 131,-1 131,111 3,111"/>
+    </object>
+   </objectgroup>
+  </tile>
  </tileset>
  <layer id="1" name="Plattform" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJzt1u0KwjAQRNFAaKXx/d9XCgkMa/NhNkrBe2D+aMLakrENAQAAAAAAAAAAeG05uLeUA8yIObi3IweYQc/X+8azl57Dg56vdfa7dHJl1+k5PP6h57vE45FTox3/pOsp9N8B6Dk8VvTc+546un9mztntGOavs9ftQjuu80a6rv8LvTXAjHIet0pOV8+bJGvKGdR9qRE7Q599ukZnpcqcXqLJU77bO+nRtVcdj+H9N+s12r2HfGbvGT2Hhz2XNnbN6L4V+eWs1vzZe+eJff+n5wCAlhdxzgW/
+   eJzt2NsKwyAQRVFBkqL5//8tBQemg7c6KUlgLzgPqdrY4qE0IQAAAAAAAAAAAK+tBPeWS4AVsQT3lkqAFfT8Geg5POj5M9BzeDy157/8X91VPF4lV6Dn8Li656O+tsZnz/1nbQzrn7PX7bOei+Uw/h7oOTzk/G8m+szVzmEO38/p5bq3Xuh5cn5zI7Vxvc7u2yaaHGpsH2Qkqbmt/dt962tZm1Ra70fP4WF7UPvt670m0sT6mXvqyNmenX92Rv5579QIAAA1by31BTY=
   </data>
  </layer>
- <layer id="5" name="Background" width="250" height="15">
+ <layer id="5" name="Background" width="250" height="15" visible="0">
   <data encoding="base64" compression="zlib">
-   eJzt00sKwCAMQEGhq9z/wt0HQaRKIZmBLP2BbwwAAAAAAABgJf6+AHCdzqE+nUN9Oof6unQeo89bIav+9yMNdJQ7mHUx62S17sTcOOvZmJVT+wDAVy8n/QKb
+   eJzt0ysOACAMRMEmKO5/YQyqhvARDZlJnl23EQAAAAAAAAAAAABAFX0G/KengNryZ09qG6282gGAWwOeUAEP
   </data>
  </layer>
  <layer id="4" name="Enemy" width="250" height="15">
   <data encoding="base64" compression="zlib">
-   eJztzTERAAAIAzE84N8rEpg4OiT7t1UAAAAAAAAAAAAAwKaf2oud9E8AAAByDZesAE0=
+   eJztyjEBAAAMAiBTrH/UpfASbhIAAAAAAAAAAAAAYMWVLgAAABserg4ALQ==
   </data>
  </layer>
  <layer id="3" name="End" width="250" height="15">

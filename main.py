@@ -14,7 +14,9 @@ def main():
 
 	#Initalize and start game
 	game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-	game.setup_neat(config_path)
+	print("New run or load in a old run? (n/o)")
+	choice_of_run = input();
+	game.setup_neat(config_path,choice_of_run )
 	game.setup()
 	game.run()
 
