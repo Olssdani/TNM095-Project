@@ -16,8 +16,8 @@ class Score():
 	 	
 	 	#Make sure that the score does not decrease if going backwards and count the 
 	 	#frames that the AI does not move
-	 	if new_score>self.score_distance:
-	 		self.score_distance = new_score
+	 	if new_score>self.distance_score:
+	 		self.distance_score = new_score
 	 		self.counter = 0
 	 	else:
 	 		self.counter +=1 

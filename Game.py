@@ -11,6 +11,7 @@ import os
 import sys
 import pickle
 from Input import Input
+from Score import Score
 
 
 #Scaling of sprites
@@ -70,11 +71,13 @@ class Game(arcade.Window):
 		
 		#Game specific variables
 		self.game_over = False
-		self.score_distance = 0
-		self.score_minus = 0
 
 		#Input class
 		self.input = None
+
+		#Score classes for every player/AI
+		self.score_ai = Score(START_POSITION_X, 64)
+		self.score_player = Score(START_POSITION_X, 64)
 
 		#Neat
 		self.config_neat = None
@@ -83,8 +86,6 @@ class Game(arcade.Window):
 		self.current_genome_index = 0
 		self.current_genome = None
 		self.input_tiles = None
-		self.last_position_x = 0
-		self.last_position_y = 0
 		self.tile_step = INPUT_GRID_SIZE//2
 		self.net = None
 		self.counter = 0
@@ -262,7 +263,7 @@ class Game(arcade.Window):
 		
 
 		# Draw our score on the screen, scrolling it with the viewport
-		score_text = f"Score: {self.score_distance-self.score_minus}"
+		score_text = f"Score: {self.score_ai.get_score()}"
 		arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
 
@@ -340,23 +341,6 @@ class Game(arcade.Window):
 		
 		#Add the change to the sprite
 		self.player.change_x = self.speed_x 
-
-
-	#Update the score depending on the distance
-	def update_score(self):
-	 	new_score =int((self.player.center_x-START_POSITION_X) / 64)
-	 	
-	 	#Make sure that the score does not decrease if going backwards and count the 
-	 	#frames that the AI does not move
-	 	if new_score>self.score_distance:
-	 		self.score_distance = new_score
-	 		self.counter = 0
-	 	else:
-	 		self.counter +=1 
-		
-		
-	def add_to_score(self, points):
-		self.score_distance += points
 
 
 	#Managing the scrolling of the screen
@@ -446,18 +430,18 @@ class Game(arcade.Window):
 			if arcade.check_for_collision_with_list(self.player, self.death_list):
 				should_end = True
 			if arcade.check_for_collision_with_list(self.player, self.end_list):
-				self.score_distance +=1000
+				self.score_ai.add_to_score(1000)
 				should_end = True
 
 		self.scrolling()
-		self.update_score()
+		self.score_ai.update_score(self.player.center_x)
 
 		if self.counter > NO_IMPROVMENT_KILL:
 			self.counter = 0
 			should_end = True
 		if should_end:
 			if(self.type_of_run != "b"):
-				self.genomes[self.current_genome_index][1].fitness = self.score_distance -self.score_minus
+				self.genomes[self.current_genome_index][1].fitness = self.score_ai.get_score()
 				print("On genome id: " + str(self.genome_id) + " with fitness: " + str(self.genomes[self.current_genome_index][1].fitness))
 				self.current_genome_index +=1
 			self.setup()
