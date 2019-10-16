@@ -108,7 +108,7 @@ class Game(arcade.Window):
 			self.start_from_file(file_path) 
 		
 
-
+		if(run_setup == "n" or run_setup =="c" ):
 			self.genomes = list(iteritems(self.p.population))
 
 		
@@ -189,9 +189,7 @@ class Game(arcade.Window):
 		self.player.center_y = 200
 		self.player.center_x = START_POSITION_X
 		self.player_list.append(self.player)
-		self.score_distance = 0
 		self.speed_x = 0
-		self.score_minus = 0
 
 		# --- Load in a map from the tiled editor ---
 		# Name of map file to load
@@ -216,7 +214,7 @@ class Game(arcade.Window):
 		
 		#Initialize the input class with the right sprite list
 		self.input = Input(INPUT_GRID_SIZE, self.plattform_list, self.enemy_list, 64)
-
+		self.score_ai.restore()
 		#Set the movement for the enemies
 		for enemy in self.enemy_list:
 			enemy.change_x = 2
@@ -436,8 +434,7 @@ class Game(arcade.Window):
 		self.scrolling()
 		self.score_ai.update_score(self.player.center_x)
 
-		if self.counter > NO_IMPROVMENT_KILL:
-			self.counter = 0
+		if self.score_ai.get_highscore_still() > NO_IMPROVMENT_KILL:
 			should_end = True
 		if should_end:
 			if(self.type_of_run != "b"):

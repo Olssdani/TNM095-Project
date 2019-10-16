@@ -10,6 +10,13 @@ class Score():
 		self.counter = 0
 
 
+	def restore(self):
+		self.distance_score = 0
+		self.plus_score = 0
+		self.minus_score = 0
+		self.final_score = 0
+		self.counter = 0
+
 	#Update the score depending on the distance
 	def update_score(self, player_postion_x):
 	 	new_score =int((player_postion_x-self.start_position_x) / self.tile_size)
