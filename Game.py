@@ -226,7 +226,7 @@ class Game(arcade.Window):
 
 		# Create the 'physics engine'
 		self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.plattform_list, GRAVITY)
-		
+
 		#Used to keep track of our scrolling
 		self.view_bottom = 0
 		self.view_left = 0
@@ -441,9 +441,6 @@ class Game(arcade.Window):
 			self.physics_engine.update()
 
 			# See if the player hit a enemy, just restart 
-			'''
-			TODO STORE SCORE FOR EVALUATING
-			'''
 			if len(arcade.check_for_collision_with_list(self.player, self.enemy_list)) > 0:
 				should_end = True
 			if arcade.check_for_collision_with_list(self.player, self.death_list):
