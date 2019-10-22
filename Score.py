@@ -1,5 +1,9 @@
+'''
+Score class:
+This class keep the score as well as the time as the score has not updated
+'''
 class Score():
-	
+	#Constructor
 	def __init__(self, start_position_x, tile_size):
 		self.distance_score = 0
 		self.plus_score = 0
@@ -9,7 +13,7 @@ class Score():
 		self.tile_size = tile_size
 		self.counter = 0
 
-
+	#Reset all variable that could be changed
 	def restore(self):
 		self.distance_score = 0
 		self.plus_score = 0
@@ -17,8 +21,10 @@ class Score():
 		self.final_score = 0
 		self.counter = 0
 
+
 	#Update the score depending on the distance
 	def update_score(self, player_postion_x):
+	 	
 	 	new_score =int((player_postion_x-self.start_position_x) / self.tile_size)
 	 	
 	 	#Make sure that the score does not decrease if going backwards and count the 
@@ -28,6 +34,7 @@ class Score():
 	 		self.counter = 0
 	 	else:
 	 		self.counter +=1 
+
 		
 	def add_to_score(self, points):
 		self.plus_score += points
