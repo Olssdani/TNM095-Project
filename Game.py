@@ -12,18 +12,13 @@ import sys
 import pickle
 from Input import Input
 from Score import Score
+from Moveable_Character import Moveable_Character
 
 
 #Scaling of sprites
 TILE_SCALING = 0.5
 CHARACTER_SCALING = 0.4
 ENEMY_SCALING = 0.5
-
-#Player Constants!
-PLAYER_MOVEMENT_SPEED = 7
-GRAVITY = 1
-PLAYER_JUMP_SPEED = 18
-ACCELERATION = 40
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -33,10 +28,9 @@ BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 START_POSITION_X = 200
 
-
+#NEAT
 INPUT_GRID_SIZE = 9 #Keep uneven!!!
 NO_IMPROVMENT_KILL = 150
-#Max number of generations
 n = 300
 
 
@@ -52,22 +46,14 @@ class Game(arcade.Window):
 		'''
 		#Sprite lists
 		self.plattform_list = None
-		self.player_list = None
 		self.death_list = None
 		self.end_list = None
 		self.enemy_list = None
-		self.player = None
 		self.background_list = None
 
 		#Screen variables
 		self.Screen_Width = width
 		self.Screen_Height = height
-		
-		#Input controls variables
-		self.right_button_pressed = False
-		self.left_button_pressed = False
-		self.jump_button_pressed = False
-		self.speed_x = 0
 		
 		#Game specific variables
 		self.game_over = False
@@ -75,9 +61,9 @@ class Game(arcade.Window):
 		#Input class
 		self.input = None
 
-		#Score classes for every player/AI
-		self.score_ai = Score(START_POSITION_X, 64)
-		self.score_player = Score(START_POSITION_X, 64)
+		#Moveable player
+		self.ai =None
+		self.player = None
 
 		#Neat
 		self.config_neat = None
@@ -86,9 +72,7 @@ class Game(arcade.Window):
 		self.current_genome_index = 0
 		self.current_genome = None
 		self.input_tiles = None
-		self.tile_step = INPUT_GRID_SIZE//2
 		self.net = None
-		self.counter = 0
 		self.generation_counter = 1
 		self.genome_id = 0
 		self.type_of_run = None
@@ -106,12 +90,9 @@ class Game(arcade.Window):
 			input_generation_number = input()
 			file_path ='neat-checkpoint-'+str(input_generation_number)
 			self.start_from_file(file_path) 
-		
 
 		if(run_setup == "n" or run_setup =="c" ):
-			self.genomes = list(iteritems(self.p.population))
-
-		
+			self.genomes = list(iteritems(self.p.population))		
 			# Add a stdout reporter to show progress in the terminal.
 			self.p.add_reporter(neat.StdOutReporter(True))
 			stats = neat.StatisticsReporter()
@@ -121,7 +102,6 @@ class Game(arcade.Window):
 				raise RuntimeError("Cannot have no generational limit with no fitness termination")
 		elif (self.type_of_run == "b"):
 			self.current_genome = pickle.load(open( "winner.p", "rb" ))
-
 
 		self.input_tiles = [[0 for x in range(INPUT_GRID_SIZE)] for y in range(INPUT_GRID_SIZE)]
 
@@ -178,19 +158,14 @@ class Game(arcade.Window):
 	def setup(self):
 		#Setup the sprite lists
 		self.plattform_list = arcade.SpriteList()
-		self.player_list = arcade.SpriteList()
 		self.death_list = arcade.SpriteList()
 		self.end_list = arcade.SpriteList()
 		self.enemy_list = arcade.SpriteList()
 		self.background_list = arcade.SpriteList()
 
 		#Initalize the player sprite and vairables
-		self.player = arcade.Sprite("Sprites/Used/Player.png", CHARACTER_SCALING)
-		self.player.center_y = 200
-		self.player.center_x = START_POSITION_X
-		self.player_list.append(self.player)
-		self.speed_x = 0
-
+		self.ai = Moveable_Character("Ai.png", CHARACTER_SCALING, START_POSITION_X, 200)
+		self.player = Moveable_Character("Player.png", CHARACTER_SCALING, START_POSITION_X, 200)
 		# --- Load in a map from the tiled editor ---
 		# Name of map file to load
 		map_name = "Level1.tmx"
@@ -214,17 +189,18 @@ class Game(arcade.Window):
 		
 		#Initialize the input class with the right sprite list
 		self.input = Input(INPUT_GRID_SIZE, self.plattform_list, self.enemy_list, 64)
-		self.score_ai.restore()
+
 		#Set the movement for the enemies
 		for enemy in self.enemy_list:
-			enemy.change_x = 2
+			enemy.change_x = 1
 
 		# Set the background color
 		if my_map.background_color:	
 			arcade.set_background_color(my_map.background_color)
 
 		# Create the 'physics engine'
-		self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.plattform_list, GRAVITY)
+		self.ai.set_physics_engine(self.plattform_list)
+		self.player.set_physics_engine(self.plattform_list)
 
 		#Used to keep track of our scrolling
 		self.view_bottom = 0
@@ -253,7 +229,9 @@ class Game(arcade.Window):
 		
 		#Draw the objects
 		self.plattform_list.draw()
-		self.player_list.draw()
+		self.ai.draw()
+		if(self.type_of_run == "b"):
+			self.player.draw()
 		self.death_list.draw()
 		self.end_list.draw()
 		self.enemy_list.draw()
@@ -261,7 +239,11 @@ class Game(arcade.Window):
 		
 
 		# Draw our score on the screen, scrolling it with the viewport
-		score_text = f"Score: {self.score_ai.get_score()}"
+		if(self.type_of_run != "b"):
+			score_text = f"Score: {self.ai.get_score_object().get_score()}"
+		else:
+			score_text = f"Score: {self.player.get_score_object().get_score()}"
+
 		arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
 
@@ -276,99 +258,53 @@ class Game(arcade.Window):
 	def on_key_press(self, key, modifiers):
 		"""Called whenever a key is pressed. """
 		if key == arcade.key.UP or key == arcade.key.W:
-			self.jump_button_pressed = True
+			self.player.jump_button_pressed = True
 		if key == arcade.key.LEFT or key == arcade.key.A:
-			self.left_button_pressed = True
-			self.player.change_x = -PLAYER_MOVEMENT_SPEED
+			self.player.left_button_pressed = True
 		if key == arcade.key.RIGHT or key == arcade.key.D:
-			self.right_button_pressed = True
-			self.player.change_x = PLAYER_MOVEMENT_SPEED
+			self.player.right_button_pressed = True
+
 
 
 	#Oncall method for key realese, change the specific variable
 	def on_key_release(self, key, modifiers):
 		"""Called when the user releases a key. """
 		if key == arcade.key.UP or key == arcade.key.W:
-			self.jump_button_pressed = False
+			self.player.jump_button_pressed = False
 		if key == arcade.key.LEFT or key == arcade.key.A:
-			self.left_button_pressed = False
+			self.player.left_button_pressed = False
 		elif key == arcade.key.RIGHT or key == arcade.key.D:
-			self.right_button_pressed = False
-
-
-
-	#Function to update movement speed to include accerelation and deaccerelation
-	def update_movement(self, delta_time):
-		#Jump
-		if self.jump_button_pressed:
-			if self.physics_engine.can_jump():
-				self.player.change_y = PLAYER_JUMP_SPEED
-				#self.score_minus += 1
-
-		#Left button pressed accerelation
-		if self.left_button_pressed and not self.right_button_pressed:
-			self.speed_x -= ACCELERATION * delta_time
-
-			#Check if speed is larger than max speed
-			if(self.speed_x < -PLAYER_MOVEMENT_SPEED):
-				self.speed_x = -PLAYER_MOVEMENT_SPEED
-		
-		#Left button released deaccerelation
-		elif self.speed_x < 0:
-			self.speed_x += ACCELERATION * delta_time
-			
-			#Check for min speed
-			if(self.speed_x > 0):
-				self.speed_x = 0
-		
-		#Right button pressed accerelation
-		if self.right_button_pressed and not self.left_button_pressed:
-			self.speed_x += ACCELERATION * delta_time
-
-			#Check for max speed
-			if(self.speed_x > PLAYER_MOVEMENT_SPEED):
-				self.speed_x = PLAYER_MOVEMENT_SPEED
-		
-		#Right button released and deaccerelation
-		elif self.speed_x > 0:
-			self.speed_x -= ACCELERATION * delta_time
-			
-			#Check for min speed
-			if(self.speed_x < 0):
-				self.speed_x = 0
-		
-		#Add the change to the sprite
-		self.player.change_x = self.speed_x 
+			self.player.right_button_pressed = False
 
 
 	#Managing the scrolling of the screen
-	def scrolling(self):
+	def scrolling(self, object):
 		
 		# Track if we need to change the viewport
 		changed = False
 
 		# Scroll left
 		left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN	
-		if self.player.left < left_boundary:
-			self.view_left -= left_boundary - self.player.left
+		if object.left < left_boundary:
+			self.view_left -= left_boundary - object.left
 			changed = True
 
 		# Scroll right
 		right_boundary = self.view_left + self.Screen_Width - RIGHT_VIEWPORT_MARGIN
-		if self.player.right > right_boundary:
-			self.view_left += self.player.right - right_boundary
+		if object.right > right_boundary:
+			self.view_left += object.right - right_boundary
 			changed = True
 
 		# Scroll up
 		top_boundary = self.view_bottom + self.Screen_Height - TOP_VIEWPORT_MARGIN
-		if self.player.top > top_boundary:
-			self.view_bottom += self.player.top - top_boundary
+		if object.top > top_boundary:
+			self.view_bottom += object.top - top_boundary
 			changed = True
 
 		# Scroll down
 		bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
-		if self.player.bottom < bottom_boundary and self.player.bottom>BOTTOM_VIEWPORT_MARGIN:
-			self.view_bottom -= bottom_boundary - self.player.bottom
+		if object.bottom < bottom_boundary and object.bottom>BOTTOM_VIEWPORT_MARGIN:
+			self.view_bottom -= bottom_boundary - object.bottom
 			changed = True
 
 		if changed:
@@ -388,62 +324,88 @@ class Game(arcade.Window):
 
 		#Create a list of the input matrix
 		inputs = list(())
-		self.input_tiles = self.input.get_input_tiles(self.player.center_x, self.player.center_y)
+		self.input_tiles = self.input.get_input_tiles(self.ai.object.center_x, self.ai.object.center_y)
 		for y in range(INPUT_GRID_SIZE):
 			for x in range(INPUT_GRID_SIZE):
 				inputs.append(self.input_tiles[y][x])
 	
+		#self.input.print_input_tile()
 		#Calculate the outputs.
 		nnOutput = self.net.activate(inputs)
-
 		nnOutput[0] = round(nnOutput[0])
 		nnOutput[1] = round(nnOutput[1])
 		nnOutput[2] = round(nnOutput[2])
-		#print(nnOutput)
-		self.left_button_pressed = nnOutput[0]
-		self.jump_button_pressed = nnOutput[1]
-		self.right_button_pressed = nnOutput[2]
+
+		
+		self.ai.left_button_pressed = nnOutput[0]
+		self.ai.jump_button_pressed = nnOutput[1]
+		self.ai.right_button_pressed = nnOutput[2]
 		
 		#Update the movement on the player
-		self.update_movement(delta_time)
+		self.ai.update_movement(delta_time)
+		self.player.update_movement(delta_time)
+		#self.update_movement(delta_time)
 
 		 # Update the player based on the physics engine and move the enemies
-		if not self.game_over:
-			
-			# Move the enemies
-			self.enemy_list.update()
 
-			# Check each enemy
-			for enemy in self.enemy_list:
-				# If the enemy hit a wall, reverse
-				if len(arcade.check_for_collision_with_list(enemy, self.plattform_list)) > 0:
-					enemy.change_x *= -1
 			
-			# Update the player using the physics engine
-			self.physics_engine.update()
+		# Move the enemies
+		self.enemy_list.update()
 
+		# Check each enemy
+		for enemy in self.enemy_list:
+			# If the enemy hit a wall, reverse
+			if len(arcade.check_for_collision_with_list(enemy, self.plattform_list)) > 0:
+				enemy.change_x *= -1
+			
+		# Update the player using the physics engine
+		self.ai.physics.update()
+		self.player.physics.update()
+
+		if(self.type_of_run != "b"):
 			# See if the player hit a enemy, just restart 
-			if len(arcade.check_for_collision_with_list(self.player, self.enemy_list)) > 0:
+			if len(arcade.check_for_collision_with_list(self.ai.object, self.enemy_list)) > 0:
 				should_end = True
-			if arcade.check_for_collision_with_list(self.player, self.death_list):
+			if arcade.check_for_collision_with_list(self.ai.object, self.death_list):
 				should_end = True
-			if arcade.check_for_collision_with_list(self.player, self.end_list):
-				self.score_ai.add_to_score(1000)
+			if arcade.check_for_collision_with_list(self.ai.object, self.end_list):
+				self.ai.get_score_object.add_to_score(1000)
 				should_end = True
+			self.scrolling(self.ai.object)
+			self.ai.get_score_object().update_score(self.ai.object.center_x)
 
-		self.scrolling()
-		self.score_ai.update_score(self.player.center_x)
-
-		if self.score_ai.get_highscore_still() > NO_IMPROVMENT_KILL:
-			should_end = True
-		if should_end:
-			if(self.type_of_run != "b"):
-				self.genomes[self.current_genome_index][1].fitness = self.score_ai.get_score()
+			if self.ai.get_score_object().get_highscore_still() > NO_IMPROVMENT_KILL:
+				should_end = True
+			if should_end:
+				
+				self.genomes[self.current_genome_index][1].fitness = self.ai.get_score_object().get_score()
 				print("On genome id: " + str(self.genome_id) + " with fitness: " + str(self.genomes[self.current_genome_index][1].fitness))
 				self.current_genome_index +=1
-			self.setup()
-		
+				self.setup()
+		else:
+			# See if the player hit a enemy, just restart 
+			if len(arcade.check_for_collision_with_list(self.ai.object, self.enemy_list)) > 0:
+				self.ai.show = False
+				self.setup()
+			if arcade.check_for_collision_with_list(self.ai.object, self.death_list):
+				self.ai.show = False
+				self.setup()
+			if arcade.check_for_collision_with_list(self.ai.object, self.end_list):
+				self.ai.show = False
+				self.setup()
 
+			if len(arcade.check_for_collision_with_list(self.player.object, self.enemy_list)) > 0:
+				should_end = True
+			if arcade.check_for_collision_with_list(self.player.object, self.death_list):
+				should_end = True
+			if arcade.check_for_collision_with_list(self.player.object, self.end_list):
+				should_end = True
+
+			self.scrolling(self.ai.object)
+			self.player.get_score_object().update_score(self.player.object.center_x)
+			if should_end:
+				self.setup()
+		
 
 	def run(self):
 		arcade.run()
