@@ -2,7 +2,13 @@
 This is a project for the the course TNM095 - Artificial Intelligence for Interactive Media at Linköpings University. The aim of the project was to implement an AI that could play a 2D platform game similiar to the original Mario game. The AI is controlled and trained by a neuroevolution of augmenting topologies(NEAT) network. 
 
 ## About
-This project has used [Python-Neat library](https://neat-python.readthedocs.io/en/latest/index.html)
+This project has used [Python-Neat library](https://neat-python.readthedocs.io/en/latest/index.html) and [Pyhton Arcade library](http://arcade.academy/index.html) to make an AI that could play a 2D platformer. The project is at its end state and will not be further developt since the course has ended. It has some minor error which can be read about in the error chapter.
+
+### Errors
+In the current versions its feels like the AI cannot se the enemies which I think is because of the Python-Neat library somewear clamp my values but not sure.
+
+### Graphics
+All graphics are made by (Liz Molnar)[https://raventale.itch.io/nature-tile-set] except for the ugly sprites for the player, AI and enemies which are just placeholder for the moment.
 
 
 ## How to try it
