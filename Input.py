@@ -5,8 +5,9 @@ import arcade
 import Constant
 
 
-
 class Input():
+
+
 	#Constructor 
 	def __init__(self, grid_size, plattform_list, enemy_list, tile_size):
 		self.grid_size = grid_size
@@ -18,13 +19,15 @@ class Input():
 		self.last_position_y = 0
 		self.input_tiles = [[0 for x in range(self.grid_size)] for y in range(self.grid_size)]
 
+
 	#Return value for the tile depending on whats on that tile
 	def get_tile_sort(self, point):
-		#Value for the tiles is hostile =-1, nothing = 0 and plattform =1
+		#Value for the tiles is hostile =-1, nothing = 0 and plattform = 1
 		if len(arcade.get_sprites_at_point(point, self.plattform_list)) > 0:
 			return Constant.PLATTFORM
 		else:
 			return Constant.NOTHING
+
 
 	#Get tiles in a surrounding area around the player as input. Each tile corresponds to
 	#a number where platfrom = 1, nothing = 0 and enemy = -1. Number of tiles is controlled
@@ -35,13 +38,7 @@ class Input():
 		player_x = (position_x // self.tile_size ) * self.tile_size + self.tile_size/2
 		player_y = (position_y // self.tile_size ) * self.tile_size + self.tile_size/2
 		
-		for y in range(self.grid_size):
-			for x in range(self.grid_size):
-				point  = (player_x+(x-self.tile_step)*self.tile_size, player_y-(y-self.tile_step)*self.tile_size)
-				if(len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0):
-					self.input_tiles[y][x] = -1
-				elif(self.input_tiles[y][x] < 0):
-					self.input_tiles[y][x] = 0
+
 		#Check if player have moved into another tile otherwise do not update the input tiles
 		if(self.last_position_y !=player_y or self.last_position_x != player_x):
 			
@@ -73,7 +70,7 @@ class Input():
 					point  = (player_x-(self.tile_step)*self.tile_size, player_y-(y-self.tile_step)*self.tile_size)
 					self.input_tiles[y][0] = self.get_tile_sort(point)
 			
-			#IF the player has gone down
+			#If the player has gone down
 			elif (self.last_position_y < player_y):				
 				for x in range(self.grid_size):
 					for y in range(self.grid_size-2, -1, -1):
@@ -81,6 +78,7 @@ class Input():
 				for x in range(self.grid_size):
 					point  = (player_x-(x-self.tile_step)*self.tile_size, player_y+(self.tile_step)*self.tile_size)
 					self.input_tiles[0][x] = self.get_tile_sort(point)
+			
 			#If the player has gone up
 			elif (self.last_position_y > player_y):		
 				for x in range(self.grid_size):
@@ -90,6 +88,15 @@ class Input():
 					point  = (player_x + (x - self.tile_step) * self.tile_size, player_y - self.tile_step * self.tile_size)
 					self.input_tiles[self.grid_size-1][x] = self.get_tile_sort(point)
 		
+		#Check for enemies last
+		for y in range(self.grid_size):
+			for x in range(self.grid_size):
+				point  = (player_x+(x-self.tile_step)*self.tile_size, player_y-(y-self.tile_step)*self.tile_size)
+				if(len(arcade.get_sprites_at_point(point, self.enemy_list)) > 0):
+					self.input_tiles[y][x] = -1
+				elif(self.input_tiles[y][x] < 0):
+					self.input_tiles[y][x] = 0
+		
 		#Update last postion
 		self.last_position_x = player_x
 		self.last_position_y = player_y
@@ -97,16 +104,13 @@ class Input():
 		return self.input_tiles
 
 
-	#Print the input tiles in the console, used for debug
+	#Print the input tiles in the console
 	def print_input_tile(self):
-		#Print tile, for debug use only
 		for y in range(self.grid_size):
 			for x in range(self.grid_size):
 				if(x == self.grid_size-1):
 					print(self.input_tiles[y][x])
 				else:
 					print(self.input_tiles[y][x], end=' ')
-
-
 		print(" ")
 
