@@ -6,3 +6,4 @@ Constant that is used in multiple file
 PLATTFORM = 1
 NOTHING = 0
 ENEMY = -1
+TILE_SIZE = 64

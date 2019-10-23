@@ -6,17 +6,20 @@ The Neat algorithm is also contain inside this class
 
 #Imports
 import arcade
-from datetime import time
+import gc
+import pickle
 import neat
+import Constant
+
+from datetime import time
 from neat.reporting import ReporterSet
 from neat.math_util import mean
 from neat.six_util import iteritems, itervalues
 from arcade.arcade_types import Point
-import gc
-import pickle
 from Input import Input
 from Score import Score
 from Moveable_Character import Moveable_Character
+
 
 
 #Scaling of sprites
@@ -192,7 +195,7 @@ class Game(arcade.Window):
 		self.background_list = arcade.tilemap.process_layer(my_map, plattform_layer_name, TILE_SCALING)
 		
 		#Initialize the input class with the right sprite list
-		self.input = Input(INPUT_GRID_SIZE, self.plattform_list, self.enemy_list, 64)
+		self.input = Input(INPUT_GRID_SIZE, self.plattform_list, self.enemy_list, Constant.TILE_SIZE)
 
 		#Set the movement for the enemies
 		for enemy in self.enemy_list:

@@ -1,9 +1,17 @@
+'''
+Moveable Character class
+This class handles all functionality of a sprite that can be moved
+either by player or AI
+'''
+
 import arcade
+import Constant
+
+#Class specific constants
 PLAYER_MOVEMENT_SPEED = 7
 GRAVITY = 1
 PLAYER_JUMP_SPEED = 18
 ACCELERATION = 40
-TILE_SIZE = 64
 
 from Score import Score 
 class Moveable_Character():
@@ -19,7 +27,7 @@ class Moveable_Character():
 		self.jump_button_pressed = False
 		self.left_button_pressed = False
 		self.right_button_pressed = False
-		self.score = Score(start_pos_x, TILE_SIZE)
+		self.score = Score(start_pos_x, Constant.TILE_SIZE)
 		self.show = True
 
 
@@ -29,12 +37,13 @@ class Moveable_Character():
 
 	#Function to update movement speed to include accerelation and deaccerelation
 	def update_movement(self, delta_time):
-		#Jump
+		
+		#If object should be rendered
 		if self.show:
+			#Jump
 			if self.jump_button_pressed:
 				if self.physics.can_jump():
 					self.object.change_y = PLAYER_JUMP_SPEED
-					#self.score_minus += 1
 
 			#Left button pressed accerelation
 			if self.left_button_pressed and not self.right_button_pressed:
@@ -71,19 +80,11 @@ class Moveable_Character():
 			#Add the change to the sprite
 			self.object.change_x = self.speed_x
 
+
 	def draw(self):
 		if(self.show):
 			self.object_list.draw()
 
-	'''
-	def update_score(self, player_postion_x)
-		self.score.update_score(player_postion_x)
 
-	def get_score(self):
-		return self.score.get_score()
-
-	def get_score_counter(self):
-		return self.score.get_highscore_still()
-	'''
 	def get_score_object(self):
 		return self.score
