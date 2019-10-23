@@ -10,6 +10,8 @@ In the current versions its feels like the AI cannot se the enemies which I thin
 ### Graphics
 All graphics are made by (Liz Molnar)[https://raventale.itch.io/nature-tile-set] except for the ugly sprites for the player, AI and enemies which are just placeholder for the moment.
 
+![Test](https://github.com/Olssdani/TNM095-Project/blob/master/game.png?raw=true "Title")
+
 
 ## How to try it
 If you want to try it out it is fairly simple, just follow the steps in descirbed next but if you want to change anything in the config file I refer you to the Python-Neat documentation. 
